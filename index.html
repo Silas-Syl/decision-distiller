@@ -1,0 +1,2369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#185fa5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="决策蒸馏">
+<meta name="description" content="把「我是怎么想的」变成可检验的系统：记录、复盘、蒸馏原则、校准训练。">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>决策蒸馏 · Decision Distiller v4.0</title>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --line:#e3e5e8;
+  --t1:#1f2329; --t2:#5f6470; --t3:#8a909c;
+  --blue:#185fa5; --blue-l:#e6f1fb;
+  --green:#0f6e56; --green-l:#e1f5ee;
+  --red:#a32d2d; --red-l:#fcebeb;
+  --purple:#534ab7; --purple-l:#eeedfe;
+  --amber:#854f0b; --amber-l:#faeeda;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t1);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  font-size:14px;line-height:1.65}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:14px 20px 0;position:sticky;top:0;z-index:50}
+.hrow{max-width:980px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+h1 img{width:22px;height:22px;border-radius:6px}
+.sub{color:var(--t2);font-size:12px}
+nav{max-width:980px;margin:0 auto;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{border:none;background:none;padding:9px 15px;font-size:13.5px;color:var(--t2);
+  cursor:pointer;border-radius:8px 8px 0 0;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
+nav button.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+nav button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle}
+main{max-width:980px;margin:0 auto;padding:20px 16px 110px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+h2{font-size:15.5px;font-weight:700;margin-bottom:10px}
+h3{font-size:14px;font-weight:600;margin-bottom:8px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.muted{color:var(--t2);font-size:12.5px}
+.tiny{color:var(--t3);font-size:11.5px}
+.why{background:var(--purple-l);color:var(--purple);border-radius:8px;padding:8px 12px;font-size:12px;margin:10px 0}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--t2);margin:12px 0 5px}
+input[type=text],input[type=password],input[type=number],textarea,select{
+  width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13.5px;
+  font-family:inherit;background:#fff;color:var(--t1)}
+textarea{resize:vertical;min-height:70px}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--blue-l);border-color:var(--blue)}
+button.btn{border:none;border-radius:8px;padding:8px 16px;font-size:13.5px;cursor:pointer;font-family:inherit;
+  background:var(--blue);color:#fff;font-weight:600}
+button.btn:hover{filter:brightness(1.08)}
+button.btn.ghost{background:var(--card);color:var(--t2);border:1px solid var(--line);font-weight:500}
+button.btn.sm{padding:5px 11px;font-size:12.5px}
+button.btn.warn{background:var(--red)}
+button.btn.ok{background:var(--green)}
+button.btn.install{background:var(--green-l);color:var(--green);font-size:12px;padding:5px 12px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.slider-row{display:flex;align-items:center;gap:10px}
+.slider-row input{flex:1}
+.slider-val{min-width:44px;text-align:center;font-weight:700;color:var(--blue)}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+.tag.blue{background:var(--blue-l);color:var(--blue)}
+.tag.green{background:var(--green-l);color:var(--green)}
+.tag.red{background:var(--red-l);color:var(--red)}
+.tag.amber{background:var(--amber-l);color:var(--amber)}
+.tag.purple{background:var(--purple-l);color:var(--purple)}
+.tag.gray{background:#eef0f2;color:var(--t2)}
+.alert{border-radius:10px;padding:12px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.alert.red{background:var(--red-l);border:1px solid #f1c9c9}
+.alert.amber{background:var(--amber-l);border:1px solid #efd9b0}
+.alert.blue{background:var(--blue-l);border:1px solid #c9dff2}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.stat .num{font-size:23px;font-weight:800;color:var(--blue)}
+.stat .lbl{font-size:12px;color:var(--t2)}
+.list-item{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:9px;display:flex;
+  justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;cursor:pointer;background:#fff}
+.list-item:hover{border-color:var(--blue)}
+.mode-card{border:1.5px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;background:#fff;transition:.15s}
+.mode-card:hover{border-color:var(--blue);box-shadow:0 2px 10px rgba(24,95,165,.08)}
+.mode-card .ico{font-size:24px}
+.mode-card h3{margin:6px 0 4px}
+.progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.progress i{display:block;height:100%;background:var(--blue);transition:.3s}
+.steps-nav{display:flex;justify-content:space-between;margin-top:18px}
+.chat-box{height:52vh;min-height:300px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;
+  padding:14px;background:#fafbfc;margin-bottom:10px}
+.msg{max-width:82%;margin-bottom:10px;padding:9px 13px;border-radius:12px;font-size:13.5px;white-space:pre-wrap;word-break:break-word}
+.msg.ai{background:var(--blue-l);color:var(--t1);border-bottom-left-radius:3px}
+.msg.me{background:var(--blue);color:#fff;margin-left:auto;border-bottom-right-radius:3px}
+.chat-input{display:flex;gap:8px}
+.chat-input textarea{min-height:44px;max-height:120px}
+.modal-mask{position:fixed;inset:0;background:rgba(20,25,35,.45);z-index:100;display:flex;
+  align-items:flex-start;justify-content:center;padding:30px 14px;overflow-y:auto}
+.modal{background:#fff;border-radius:14px;max-width:680px;width:100%;padding:22px;position:relative}
+.modal .close{position:absolute;top:12px;right:14px;border:none;background:none;font-size:20px;cursor:pointer;color:var(--t3)}
+.bar-wrap{margin-bottom:8px}
+.bar-line{display:flex;align-items:center;gap:8px;font-size:12px}
+.bar{flex:1;background:var(--line);border-radius:4px;height:14px;position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--blue)}
+.fc-card{min-height:180px;border-radius:14px;border:1.5px solid var(--line);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:26px;cursor:pointer;background:#fff}
+.fc-card .big{font-size:16px;font-weight:700;line-height:1.7}
+.checks{display:flex;flex-wrap:wrap;gap:7px}
+.checks label{display:flex;align-items:center;gap:5px;margin:0;font-weight:400;font-size:12.5px;
+  border:1px solid var(--line);border-radius:20px;padding:4px 11px;cursor:pointer}
+.checks label.on{background:var(--blue-l);border-color:var(--blue);color:var(--blue)}
+.radio-row{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}
+.radio-row label{display:flex;align-items:center;gap:5px;margin:0;font-weight:500;cursor:pointer}
+.opt-row{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:9px;background:#fbfcfd}
+.opt-row .del{float:right;border:none;background:none;color:var(--t3);cursor:pointer;font-size:15px}
+.pf-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.pf-row:last-of-type{border-bottom:none}
+.pf-btn{border:1px solid var(--line);background:#fff;border-radius:20px;padding:4px 12px;font-size:12px;
+  cursor:pointer;color:var(--t2);white-space:nowrap}
+.pf-btn.ok{background:var(--green-l);border-color:var(--green);color:var(--green);font-weight:700}
+.pf-btn.no{background:#fcebeb;border-color:var(--red);color:var(--red);font-weight:700}
+.pf-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-left:2px;
+  background:#f2f4f6;color:var(--t2)}
+.pf-badge.good{background:var(--green-l);color:var(--green)}
+.pf-badge.warn{background:#fff6e5;color:#c07800}
+.pf-badge.bad{background:#fcebeb;color:var(--red)}
+.pf-badge.none{background:#f2f4f6;color:var(--t3)}
+.metric{border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:#fbfcfd;
+  display:flex;flex-direction:column}
+.m-h{font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:baseline;
+  color:var(--t1);border-bottom:1px dashed var(--line);padding-bottom:7px;margin-bottom:8px}
+.m-h span{font-size:10.5px;font-weight:400;color:var(--t3)}
+.m-v{font-size:30px;font-weight:800;line-height:1.1;letter-spacing:-.5px}
+.m-n{font-size:11.5px;color:var(--t2);margin-top:2px}
+.m-t{font-size:11.5px;color:var(--t3);margin-top:7px;flex:1;line-height:1.5}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:4px 10px;font-size:13px}
+.kv .k{color:var(--t3);font-size:12px}
+.domain-row{display:flex;justify-content:space-between;align-items:center;padding:9px 4px;border-bottom:1px dashed var(--line);font-size:13px}
+.domain-row:last-child{border-bottom:none}
+.footer-note{text-align:center;color:var(--t3);font-size:11.5px;padding:16px 0 0}
+#toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translateX(-50%) translateY(16px);
+  background:#1f2329;color:#fff;padding:10px 18px;border-radius:24px;font-size:13px;opacity:0;
+  pointer-events:none;transition:.25s;z-index:300;max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#fab{position:fixed;right:20px;bottom:calc(88px + var(--safe-b));width:56px;height:56px;border-radius:50%;
+  border:none;background:var(--blue);color:#fff;font-size:22px;cursor:pointer;z-index:90;
+  box-shadow:0 4px 14px rgba(24,95,165,.35);display:flex;align-items:center;justify-content:center}
+#fab:active{transform:scale(.94)}
+.kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;
+  padding:1px 7px;font-size:11.5px;background:#fff;color:var(--t2);font-family:monospace}
+.search-wrap{position:relative}
+.search-wrap input{padding-left:32px}
+.search-wrap:before{content:'⌕';position:absolute;left:10px;top:7px;color:var(--t3);font-size:16px}
+@media(max-width:600px){
+  .kv{grid-template-columns:88px 1fr}
+  main{padding:14px 10px 150px}
+  header{position:static}
+  header nav{position:fixed;bottom:0;left:0;right:0;max-width:none;background:#fff;
+    border-top:1px solid var(--line);z-index:60;padding:4px 2px calc(4px + var(--safe-b))}
+  header nav button{flex:1;text-align:center;padding:8px 2px;font-size:11.5px;border-radius:8px;border-bottom:none}
+  header nav button.active{background:var(--blue-l)}
+  #fab{bottom:calc(66px + var(--safe-b))}
+  .sub{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <h1><img src="icon.svg" alt="" onerror="this.style.display='none'">决策蒸馏</h1>
+      <span class="sub">Decision Distiller v4.0 · 把"我是怎么想的"变成可检验的系统</span>
+    </div>
+    <button class="btn install" id="install-btn" style="display:none" onclick="installApp()">📲 安装App</button>
+  </div>
+  <nav id="nav"></nav>
+</header>
+<main id="view"></main>
+<button id="fab" onclick="fabQuick()" title="快速记录 (快捷键 N)">⚡</button>
+<div id="modal-root"></div>
+
+<script>
+/* ================= 数据层 ================= */
+var LS_KEY = 'dd_data_v1';
+var S = load();
+function defaults(){
+  return { v:2, decisions:[], principles:[], replays:[], fcStats:{},
+    settings:{aiEndpoint:'',aiKey:'',aiModel:''},
+    assess:null, assessHist:[], forecasts:[], sjt:[],
+    usage:{quick:0,quickDone:0,guided:0,ai:0,reviews:0,replays:0,fcEasy:0,fcHard:0,forecasts:0,sjt:0,assess:0,arc:0,seed:0},
+    lastExport:null, lastBackup:null, bkName:'' };
+}
+/* 旧版本数据（含外部导入的备份）补齐缺失字段，避免新功能读到 undefined */
+function migrate(d){
+  var def=defaults();
+  if(!d || !d.decisions) return def;
+  for(var k in def){ if(d[k]==null) d[k]=def[k]; }
+  for(var ku in def.usage){ if(d.usage[ku]==null) d.usage[ku]=def.usage[ku]; }
+  for(var ks in def.settings){ if(d.settings[ks]==null) d.settings[ks]=def.settings[ks]; }
+  if(!d.assessHist) d.assessHist=[];
+  return d;
+}
+function load(){
+  try{
+    var d = JSON.parse(localStorage.getItem(LS_KEY));
+    if(d && d.decisions) return migrate(d);
+  }catch(e){}
+  return defaults();
+}
+function save(){
+  localStorage.setItem(LS_KEY, JSON.stringify(S));
+  idbMirror();
+  scheduleAutoBackup();
+}
+/* 导出/备份统一走这里：剥离 API Key 与内部字段 */
+function stripKey(d){
+  var c=JSON.parse(JSON.stringify(d));
+  if(c.settings) c.settings.aiKey='';
+  delete c._bkThrottle;
+  return c;
+}
+
+/* ---------- IndexedDB 镜像：localStorage 被清/损坏时的第二份活拷贝 ---------- */
+function idbOpen(){
+  try{
+    if(!window.indexedDB) return null;
+    var rq=window.indexedDB.open('dd_store',1);
+    rq.onupgradeneeded=function(e){ e.target.result.createObjectStore('kv'); };
+    return rq;
+  }catch(e){ return null; }
+}
+function idbMirror(){
+  try{
+    var rq=idbOpen(); if(!rq) return;
+    rq.onsuccess=function(e){ var db=e.target.result;
+      try{ db.transaction('kv','readwrite').objectStore('kv').put(JSON.stringify(S),'main'); }catch(_){} };
+  }catch(e){}
+}
+/* 启动时若 localStorage 空、镜像有数据 → 自动找回 */
+function idbRescue(){
+  try{
+    var rq=idbOpen(); if(!rq) return;
+    rq.onsuccess=function(e){ var db=e.target.result;
+      try{
+        db.transaction('kv','readonly').objectStore('kv').get('main').onsuccess=function(ev){
+          var t=ev.target.result; if(!t) return;
+          var d; try{ d=JSON.parse(t); }catch(_){ return; }
+          if(d && d.decisions && d.decisions.length && (!S.decisions || !S.decisions.length)){
+            S=migrate(d); save(); render();
+            toast('♻️ 已从备用存储找回 '+S.decisions.length+' 条记录（浏览器清过主存储）');
+          }
+        };
+      }catch(_){} };
+  }catch(e){}
+}
+function idbClear(){
+  try{
+    var rq=idbOpen(); if(!rq) return;
+    rq.onsuccess=function(e){ var db=e.target.result;
+      try{ db.transaction('kv','readwrite').objectStore('kv').clear(); }catch(_){} };
+  }catch(e){}
+}
+
+/* ---------- 文件自动备份（File System Access，Chrome/Edge 桌面） ----------
+   一次性选好备份文件后，句柄存进 IndexedDB，之后写入不再需要用户操作 */
+function setupAutoBackup(){
+  if(!(window.showSaveFilePicker)){ toast('当前浏览器不支持自动备份文件（需 Chrome/Edge 桌面版）。请每 30 天手动导出 JSON。',4200); return; }
+  window.showSaveFilePicker({suggestedName:'决策蒸馏-自动备份.json',
+    types:[{description:'JSON 备份',accept:{'application/json':['.json']}}]})
+  .then(function(h){
+    return h.createWritable().then(function(w){
+      return w.write(JSON.stringify(stripKey(S))).then(function(){ return w.close(); });
+    }).then(function(){ return h; });
+  })
+  .then(function(h){
+    try{
+      var rq=idbOpen();
+      if(rq) rq.onsuccess=function(e){ var db=e.target.result;
+        try{ db.transaction('kv','readwrite').objectStore('kv').put(h,'backupHandle'); }catch(_){} };
+    }catch(_){}
+    S.bkName=h.name; S.lastBackup=Date.now(); save();
+    toast('✅ 自动备份已连接：'+h.name+'（此后自动写入，不需要再点）');
+  })
+  .catch(function(){ /* 用户取消 */ });
+}
+function autoBackupNow(){
+  try{
+    var rq=idbOpen(); if(!rq){ return; }
+    rq.onsuccess=function(e){ var db=e.target.result;
+      try{
+        db.transaction('kv','readonly').objectStore('kv').get('backupHandle').onsuccess=function(ev){
+          var h=ev.target.result; if(!h){ return; }
+          h.createWritable().then(function(w){
+            return w.write(JSON.stringify(stripKey(S))).then(function(){ return w.close(); });
+          }).then(function(){
+            S.lastBackup=Date.now(); localStorage.setItem(LS_KEY, JSON.stringify(S));
+            toast('💾 已写入备份文件 '+h.name);
+          }).catch(function(){});
+        };
+      }catch(_){} };
+  }catch(e){}
+}
+var _bkLast=0;
+function scheduleAutoBackup(){
+  if(Date.now()-_bkLast<600000) return;   /* 至多每 10 分钟写一次盘 */
+  _bkLast=Date.now();
+  setTimeout(autoBackupNow, 2000);
+}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function daysSince(iso){ return Math.floor((Date.now()-new Date(iso).getTime())/86400000); }
+function fmtDate(iso){ var d=new Date(iso); return d.getMonth()+1+'月'+d.getDate()+'日'; }
+function fmtFull(iso){ var d=new Date(iso); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+var DOMAINS=['职业发展','投资理财','人际关系','健康生活','消费购买','学习成长','其他'];
+var BIASES=['结果偏差（以结果论好坏）','确认偏误（只找支持自己的证据）','过度自信','损失厌恶','锚定效应','沉没成本','现状偏差','社会认同（随大流）','即时满足偏好','事后诸葛亮','情绪推理','框架效应'];
+var EMO_PRE=['焦虑','兴奋','恐惧','愤怒','平静','犹豫','压力','期待','疲惫','羞愧','内疚','好奇'];
+
+/* ================= 反馈组件（toast / 确认框） ================= */
+function toast(msg,ms){
+  var t=document.getElementById('toast');
+  if(!t){ t=document.createElement('div'); t.id='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.className='show';
+  clearTimeout(t._t); t._t=setTimeout(function(){ t.className=''; }, ms||2600);
+}
+var _cb=null;
+function confirmBox(msg,onOk){
+  _cb=onOk;
+  document.getElementById('modal-root').innerHTML=
+    '<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal" style="max-width:400px;padding:20px">'
+    +'<h2>确认</h2><p style="margin:6px 0 18px;font-size:13.5px">'+esc(msg)+'</p>'
+    +'<div style="display:flex;gap:10px"><button class="btn warn" style="flex:1" onclick="_cbOk()">确认</button>'
+    +'<button class="btn ghost" style="flex:1" onclick="closeModal()">取消</button></div></div></div>';
+}
+function _cbOk(){ var f=_cb; _cb=null; closeModal(); if(f)f(); }
+
+/* ================= 路由 ================= */
+var TABS=[['home','首页'],['capture','记录'],['library','决策库'],['principles','原则库'],['training','训练场'],['settings','设置']];
+var tab='home';
+function go(t){ tab=t; render(); window.scrollTo(0,0); }
+function renderNav(){
+  var due=dueReviews().length, drafts=S.decisions.filter(function(d){return d.status==='draft'}).length;
+  document.getElementById('nav').innerHTML = TABS.map(function(t){
+    var dot=(t[0]==='home'&&(due+drafts)>0)?'<span class="dot"></span>':'';
+    return '<button class="'+(tab===t[0]?'active':'')+'" onclick="go(\''+t[0]+'\')">'+t[1]+dot+'</button>';
+  }).join('');
+}
+function render(){ renderNav(); var v=document.getElementById('view');
+  if(tab==='home') v.innerHTML=viewHome();
+  else if(tab==='capture') v.innerHTML=viewCapture();
+  else if(tab==='library') v.innerHTML=viewLibrary();
+  else if(tab==='principles') v.innerHTML=viewPrinciples();
+  else if(tab==='training') v.innerHTML=viewTraining();
+  else if(tab==='settings') v.innerHTML=viewSettings();
+}
+function dueReviews(){ return S.decisions.filter(function(d){
+  return d.status==='active' && d.reviewInDays!=null && daysSince(d.createdAt)>=d.reviewInDays; }); }
+function fabQuick(){ go('capture'); setCapMode('quick'); }
+
+/* ================= 首页 ================= */
+function reviewedCount(){ return S.decisions.filter(function(d){return d.reviews&&d.reviews.length>0}).length; }
+function activeCount(){ return S.decisions.filter(function(d){return d.status==='active'}).length; }
+function avgProcess(){ var rs=allReviews().filter(function(r){return r.processScore!=null}); if(!rs.length) return null;
+  return (rs.reduce(function(a,r){return a+(r.processScore||0)},0)/rs.length).toFixed(1); }
+function allReviews(){ var out=[]; S.decisions.forEach(function(d){ (d.reviews||[]).forEach(function(r){ out.push(r); }); }); return out; }
+function reviewRate(){ var done=activeCount()+reviewedCount(); return done? Math.round(100*reviewedCount()/done):0; }
+function domainStats(){
+  var m={};
+  S.decisions.forEach(function(d){ var k=d.domain||'其他';
+    if(!m[k]) m[k]={n:0,pSum:0,pN:0};
+    m[k].n++;
+    (d.reviews||[]).forEach(function(r){ if(r.processScore!=null){ m[k].pSum+=r.processScore; m[k].pN++; } }); });
+  return m;
+}
+
+function viewHome(){
+  var due=dueReviews(), drafts=S.decisions.filter(function(d){return d.status==='draft'});
+  var soon=S.decisions.filter(function(d){ return d.status==='active' && d.reviewInDays!=null &&
+    daysSince(d.createdAt)>=d.reviewInDays*0.7 && daysSince(d.createdAt)<d.reviewInDays; });
+  var h='';
+  if(S.decisions.length===0){
+    h+='<div class="card" style="text-align:center;padding:40px 20px">'
+      +'<img src="icon.svg" style="width:56px;height:56px" onerror="this.style.display=\'none\'">'
+      +'<h2 style="margin:10px 0 6px">欢迎来到决策蒸馏</h2>'
+      +'<p class="muted" style="max-width:460px;margin:0 auto 16px">这里不做日记，只做训练数据。先诚实记录 20~30 条，'
+      +'等同一类情境出现 3 次以上，再开始蒸馏你的原则。</p>'
+      +'<button class="btn" onclick="go(\'capture\')">记录第一个决策</button>'
+      +'<p class="tiny" style="margin-top:12px">快捷键 <span class="kbd">N</span> 新记录 · <span class="kbd">/</span> 搜索</p></div>';
+  }
+  if(drafts.length){
+    h+='<div class="alert blue"><div><b>📝 '+drafts.length+' 条快捕待补全</b><div class="tiny">先倒出来是对的——趁记忆还热，花 3 分钟补全结构化字段</div></div>'
+      +'<button class="btn sm" onclick="openDetail(\''+drafts[0].id+'\')">去补全</button></div>';
+  }
+  if(due.length){
+    h+='<div class="alert red"><div><b>⏰ '+due.length+' 条决策到复盘时间了</b><div class="tiny">不复盘 = 只攒数据不关飞轮，系统会退化成笔记本。导出复盘日历后，App 不开着也会提醒你</div></div>'
+      +'<div style="display:flex;gap:6px"><button class="btn sm ghost" onclick="icsAll()">📅 日历</button>'
+      +'<button class="btn sm warn" onclick="openReview(\''+due[0].id+'\')">立即复盘</button></div></div>';
+  } else if(soon.length){
+    h+='<div class="alert amber"><div><b>⏳ '+soon.length+' 条决策即将到复盘时间</b><div class="tiny">最近的一条还剩 '+Math.max(0,Math.ceil(soon[0].reviewInDays-daysSince(soon[0].createdAt)))+' 天</div></div></div>';
+  }
+  if(S.decisions.length>=10 && (!S.lastExport || daysSince(S.lastExport)>30)){
+    h+='<div class="alert amber"><div><b>💾 距离上次备份已过 '+(S.lastExport?daysSince(S.lastExport):'≥30')+' 天</b>'
+      +'<div class="tiny">数据只存在本机——设置页「数据保险」可开自动备份文件，一劳永逸</div></div>'
+      +'<button class="btn sm" onclick="exportData()">导出备份</button></div>';
+  }
+  h+='<div class="grid g2" style="margin-bottom:14px">'
+    +stat(S.decisions.length,'累计记录') + stat(activeCount()+reviewedCount(),'进行中 / 已复盘')
+    +stat(reviewRate()+'%','复盘完成率',true) + stat(avgProcess()||'—','平均过程分') +'</div>';
+  if(S.decisions.length||S.forecasts.length) h+=metricsCard();
+  h+='<div class="card"><h2>最近决策</h2>';
+  var recent=S.decisions.slice().sort(function(a,b){return b.createdAt<a.createdAt?-1:1}).slice(0,5);
+  if(!recent.length) h+='<p class="muted">还没有记录</p>';
+  else h+=recent.map(function(d){ return listItem(d); }).join('');
+  h+='</div>';
+  var ds=domainStats(), keys=Object.keys(ds);
+  if(keys.length){
+    h+='<div class="card"><h2>领域战绩</h2>';
+    keys.forEach(function(k){
+      var d=ds[k];
+      var ps=d.pN?(d.pSum/d.pN).toFixed(1):null;
+      h+='<div class="domain-row"><span>'+esc(k)+'</span>'
+        +'<span class="tiny">'+d.n+' 条 · '+(ps?('过程分 <b style="color:'+(ps>=7?'var(--green)':ps>=5?'var(--amber)':'var(--red)')+'">'+ps+'</b>/10（'+d.pN+' 次复盘）'):'待复盘出分')+'</span></div>';
+    });
+    h+='<p class="tiny" style="margin-top:8px">过程分 < 5 的领域，就是直觉不可信、需要慢想的领域——这是你在哪类问题上该找反对意见的地图。</p></div>';
+  }
+  h+='<div class="card"><h2>飞轮状态</h2><div class="kv">'
+    +'<span class="k">记录</span><span>'+S.usage.quick+' 次快捕 · '+S.usage.guided+' 次引导 · '+S.usage.ai+' 次 AI 对话</span>'
+    +'<span class="k">补全率</span><span>'+(S.usage.quick?Math.round(100*S.usage.quickDone/S.usage.quick)+'%':'—')+'</span>'
+    +'<span class="k">复盘</span><span>'+S.usage.reviews+' 次</span>'
+    +'<span class="k">训练</span><span>'+S.usage.replays+' 次盲测回放 · '+S.usage.fcEasy+' 次闪卡通过</span>'
+    +'<span class="k">原则</span><span>'+S.principles.length+' 条（挂 '+(S.principles.reduce(function(a,p){return a+p.cases.length},0))+' 个案例）</span>'
+    +'</div></div>';
+  h+='<p class="footer-note">决策质量 ≠ 结果质量 · 系统只优化过程分 · 快捷键 <span class="kbd">N</span> 新记录 <span class="kbd">/</span> 搜索 <span class="kbd">Esc</span> 关闭</p>';
+  return h;
+}
+function stat(n,l,strong){ return '<div class="stat"><div class="num" '+(strong?'style="color:var(--green)"':'')+'>'+n+'</div><div class="lbl">'+l+'</div></div>'; }
+/* ================= 三条量化线：让原则不空泛的三条可证伪指标 ================= */
+function metricsCard(){
+  var fc=fcStats(), dqA=dqAvg(), pf=pfScore();
+  var dqN=S.decisions.filter(function(d){return d.dq}).length;
+  var h='<div class="card"><h2>三条量化线</h2>'
+    +'<p class="muted" style="margin-bottom:12px">只有文字的原则必然空泛。这三条线是系统里唯一可验证的指标——每条都标着样本量，样本不足时它会明说。</p>'
+    +'<div class="grid g3">';
+  /* 线 1：判断准确度（快轨/代理数据——真实决策的校准见训练场校准曲线） */
+  h+='<div class="metric"><div class="m-h">判断准确度<span>Brier · 代理轨</span></div>';
+  if(!fc){ h+='<div class="m-v" style="color:var(--t3)">—</div><div class="m-n">还没有已揭晓的预测</div>'
+      +'<div class="m-t">去记录一条概率判断，它是训练手感最快的燃料。</div>'; }
+  else { var c=fc.brier<0.10?'var(--green)':fc.brier<0.20?'var(--amber)':'var(--red)';
+    h+='<div class="m-v" style="color:'+c+'">'+fc.brier.toFixed(3)+'</div>'
+      +'<div class="m-n">'+fc.n+' 条已揭晓 · 校准分 '+fc.cal+'</div>'
+      +'<div class="m-t">'+(fc.brier<0.10?'概率表达很扎实，继续保持。':fc.brier<0.20?'可用，但还有提升空间——把"可能会"换成具体数字。':'概率表达需要重练：你给的百分比和现实差距过大。')+'</div>'; }
+  h+='<button class="btn ghost sm" style="margin-top:8px" onclick="go(\'training\');trainMode=\'fcst\';render()">'+(fc?'继续训练':'开始预测训练')+' →</button></div>';
+  /* 线 2：过程质量 */
+  h+='<div class="metric"><div class="m-h">过程质量<span>DQ · 最弱环节</span></div>';
+  if(dqA==null){ h+='<div class="m-v" style="color:var(--t3)">—</div><div class="m-n">还没做过质量自检</div>'
+      +'<div class="m-t">记录页有 30 秒六要素自检，<b>要在下决定之前做</b>才有意义。</div>'; }
+  else { var c2=dqA>=80?'var(--green)':dqA>=60?'var(--amber)':'var(--red)';
+    h+='<div class="m-v" style="color:'+c2+'">'+Math.round(dqA)+'</div>'
+      +'<div class="m-n">'+dqN+' 条已自检 / 共 '+S.decisions.length+' 条</div>'
+      +'<div class="m-t">链式规则：整体质量 = 最弱环节，不是平均分。看哪一条最低。</div>'; }
+  h+='<button class="btn ghost sm" style="margin-top:8px" onclick="openDQPicker()">做一次自检 →</button></div>';
+  /* 线 3：原则执行力 */
+  h+='<div class="metric"><div class="m-h">原则执行力<span>1 − 违背率</span></div>';
+  if(!pf){ h+='<div class="m-v" style="color:var(--t3)">—</div><div class="m-n">还没有原则被检验</div>'
+      +'<div class="m-t">复盘时勾选"遵守/违背"，原则才从文字变成可证伪的系统。</div>'; }
+  else { var c3=pf.score>=80?'var(--green)':pf.score>=60?'var(--amber)':'var(--red)';
+    h+='<div class="m-v" style="color:'+c3+'">'+pf.score+'%</div>'
+      +'<div class="m-n">'+pf.n+' 次原则检验</div>'
+      +'<div class="m-t">'+(pf.score>=80?'说到做到，原则在生效。':'有原则没执行。违背率高的那几条，去原则库改掉或删掉。')+'</div>'; }
+  h+='<button class="btn ghost sm" style="margin-top:8px" onclick="go(\'principles\')">看原则强度 →</button></div>';
+  return h+'</div></div>';
+}
+function listItem(d){
+  var st=d.status==='draft'?'<span class="tag gray">待补全</span>':
+    (d.reviews&&d.reviews.length?'<span class="tag green">已复盘</span>':'<span class="tag blue">进行中</span>');
+  if(d.source==='archaeo') st='<span class="tag gray">考古</span>'+st;
+  var overdue=d.status==='active'&&d.reviewInDays!=null&&daysSince(d.createdAt)>=d.reviewInDays;
+  if(overdue) st='<span class="tag red">待复盘</span>';
+  return '<div class="list-item" onclick="openDetail(\''+d.id+'\')">'
+    +'<div style="flex:1;min-width:200px"><b>'+esc(d.dtype==='prediction'?'预测：':'')+esc(trunc(d.situation,42))+'</b>'
+    +'<div class="tiny">'+fmtDate(d.createdAt)+' · '+esc(d.domain||'未分类')+' · '+modeName(d.mode)+'</div></div>'+st+'</div>';
+}
+function trunc(s,n){ s=String(s||''); return s.length>n?s.slice(0,n)+'…':s; }
+function modeName(m){ return {quick:'⚡快捕',guided:'🧭引导',ai:'🤖AI对话',archaeo:'🧱考古'}[m]||m; }
+
+/* ================= 决策时原则推送（可信度加权的落地） =================
+   匹配 = 文本相似度（中文字符二元组，剥离标点）+ 领域命中 + 证据链加成。
+   IF 条件是触发器，权重最高；至少 2 个二元组命中才算 lexical 命中（防"如果/一个"这类通用词单杀）。 */
+function bigrams(s){ s=String(s||'').replace(/[^一-龥a-zA-Z0-9]/g,''); var o={};
+  for(var i=0;i<s.length-1;i++){ o[s.substr(i,2)]=1; } return o; }
+function simHits(a,b){
+  var A=bigrams(a),B=bigrams(b);
+  var hit=0,nA=0,nB=0;
+  for(var k in A){ nA++; if(B[k]) hit++; }
+  for(var kb in B){ nB++; }
+  return {hit:hit,nA:nA||1,nB:nB||1};
+}
+function simScore(a,b){ var h=simHits(a,b); return h.hit? h.hit/h.nA : 0; }
+function matchPrinciples(text,domain,cut,n){
+  if(!S.principles.length) return [];
+  var t=String(text||'').replace(/[^一-龥a-zA-Z0-9]/g,'');
+  var list=S.principles.map(function(p){
+    var st=pStats(p);
+    var hi=simHits(t,p.ifText), ht=simHits(t,p.thenText);
+    var sc=(t.length>=6?
+        (hi.hit>=2? (hi.hit/hi.nA)*2.5 : 0) + (ht.hit>=2? (ht.hit/ht.nA) : 0)
+      : 0)
+      +((domain&&p.domain===domain)?0.6:0)
+      +0.12*Math.min(st.total,3);
+    return {p:p,st:st,sc:sc};
+  }).sort(function(a,b){return b.sc-a.sc});
+  return list.filter(function(x){return x.sc>=cut}).slice(0,n||3);
+}
+function pmBoxHtml(text,domain){
+  var list=matchPrinciples(text,domain,text&&String(text).replace(/[^一-龥a-zA-Z0-9]/g,'').length>=6?0.32:0.58,3);
+  var ds=(domain&&domainStats()[domain])||null;
+  var calLine=(ds&&ds.pN)?('该领域过程分 <b style="color:'
+    +(ds.pSum/ds.pN>=7?'var(--green)':ds.pSum/ds.pN>=5?'var(--amber)':'var(--red)')+'">'
+    +(ds.pSum/ds.pN).toFixed(1)+'</b>/10 — '+(ds.pSum/ds.pN>=7?'直觉可用区':'直觉不可信区，先慢想')+'（'+ds.pN+' 次复盘）'):'';
+  if(!list.length&&!calLine) return '';
+  var h='<div class="opt-row" style="background:var(--purple-l);border-color:#ddd0f0;margin-top:10px">'
+    +'<b style="font-size:12.5px;color:var(--purple)">📜 决策时推送 · 匹配的原则'
+    +(calLine?' <span class="tiny" style="color:var(--t3);font-weight:400">· '+calLine+'</span>':'')+'</b>';
+  list.forEach(function(x){
+    var pct=x.st.total?Math.round(x.st.rate*100):null;
+    h+='<div style="margin-top:8px;font-size:12.5px;line-height:1.6">'
+      +'<b style="color:var(--purple)">IF</b> '+esc(trunc(x.p.ifText,64))
+      +' <b style="color:var(--green)">THEN</b> '+esc(trunc(x.p.thenText,52))
+      +(x.st.total?' <span class="pf-badge '+(x.st.total>=5&&pct>=50?'bad':pct>=30?'warn':'good')+'">检验'+x.st.total+'次·违背'+pct+'%</span>':'')
+      +(x.p.source==='seed'?'<span class="pf-badge none">🌱种子</span>':'')+'</div>';
+  });
+  return h+'</div>';
+}
+var _pmT=null;
+function pmRefresh(getText,getDomain,targetId){
+  clearTimeout(_pmT);
+  _pmT=setTimeout(function(){
+    var el=document.getElementById(targetId); if(!el) return;
+    el.innerHTML=pmBoxHtml(getText(),getDomain());
+  },350);
+}
+function onQuickPM(){ pmRefresh(
+  function(){ var el=document.getElementById('q-text'); return el?el.value:''; },
+  function(){ var el=document.getElementById('q-domain'); return el?el.value:''; },
+  'pm-quick'); }
+function onWizPM(){ pmRefresh(
+  function(){ return wiz?wiz.situation:''; },
+  function(){ return wiz?wiz.domain:''; },
+  'w-pm'); }
+
+/* ================= 记录（三模式） ================= */
+var capMode=null;
+function setCapMode(m){ capMode=m; if(m==='guided') startWizard(''); if(m==='ai') initChat(); render(); }
+function viewCapture(){
+  if(capMode==='guided') return viewWizard();
+  if(capMode==='ai') return viewChat();
+  if(capMode==='quick') return viewQuick();
+  if(capMode==='arc') return viewArc();
+  var aiOn=!!(S.settings.aiEndpoint&&S.settings.aiKey&&S.settings.aiModel);
+  return '<div class="card"><h2>选择记录方式</h2><p class="muted" style="margin-bottom:14px">'
+    +'按情境选：时间紧就先快捕，说不清就交给 AI 追问，冷静从容就用引导向导。</p><div class="grid g3">'
+    +'<div class="mode-card" onclick="setCapMode(\'quick\')"><div class="ico">⚡</div><h3>30 秒快捕</h3>'
+    +'<p class="tiny">先把事情倒出来，别让细节蒸发。稍后补全，系统会盯着你。</p></div>'
+    +'<div class="mode-card" onclick="setCapMode(\'guided\')"><div class="ico">🧭</div><h3>引导向导 · 5 分钟</h3>'
+    +'<p class="tiny">五阶段结构化记录：倾倒 → 情绪标注 → 具体化 → 选项与预期 → 可证伪承诺。</p></div>'
+    +'<div class="mode-card" onclick="setCapMode(\'ai\')"><div class="ico">🤖</div><h3>AI 深度对话</h3>'
+    +'<p class="tiny">'+(aiOn?'已连接模型。适合说不清的复杂情境，AI 只追问不建议。'
+      :'未配置（设置页可接任意 OpenAI 兼容端点，含本地模型）。未配置时用引导向导，功能等价。')+'</p></div>'
+    +'<div class="mode-card" onclick="setCapMode(\'arc\')"><div class="ico">🧱</div><h3>决策考古 · AI</h3>'
+    +'<p class="tiny">粘贴过去的日记/聊天记录，AI 找出"结果已知"的历史决策，回溯建档——瞬间获得带真值的样本。</p></div>'
+    +'</div>'
+    +'<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">'
+    +'<div><b style="font-size:13px">📐 已经想好了？先做 30 秒质量自检</b>'
+    +'<div class="tiny">决策质量六要素（SDG）：整体质量 = 最弱环节。事前做才有意义。</div></div>'
+    +'<button class="btn ghost sm" onclick="openDQPicker()">选一条记录自检 →</button></div>'
+    +'</div>';
+}
+function viewQuick(){
+  return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<h2 style="margin:0">⚡ 30 秒快捕</h2><button class="btn ghost sm" onclick="capMode=null;render()">← 返回</button></div>'
+    +'<p class="muted">规则：不停笔、不修饰、不判断对错。写不出完整句子就写碎片词。</p>'
+    +'<label>现在面对什么事？（自由倾倒）</label><textarea id="q-text" style="min-height:110px" oninput="onQuickPM()" placeholder="例如：老板今天暗示要调我去新部门，我心里既想要机会又怕搞砸，还没回他……"></textarea>'
+    +'<div id="pm-quick">'+pmBoxHtml('','')+'</div>'
+    +'<label>领域（可选）</label><select id="q-domain" onchange="onQuickPM()"><option value="">稍后定</option>'
+    +DOMAINS.map(function(d){return '<option>'+d+'</option>'}).join('')+'</select>'
+    +'<div style="margin-top:16px;display:flex;gap:10px"><button class="btn" onclick="saveQuick()">存为待补全</button>'
+    +'<button class="btn ghost" onclick="quickToGuided()">存完直接进引导向导 →</button></div>'
+    +'<p class="tiny" style="margin-top:10px">焦虑或时间压力下，情绪记忆约 1 小时后开始失真——越早倒出来越好。</p></div>';
+}
+function saveQuick(){
+  var t=document.getElementById('q-text').value.trim();
+  if(!t){ toast('先写点什么，哪怕几个词。'); return; }
+  var d={id:uid(),createdAt:new Date().toISOString(),mode:'quick',status:'draft',
+    situation:t,domain:document.getElementById('q-domain').value||'其他',dtype:'decision',
+    options:[],reviews:[],emotions:[]};
+  S.decisions.unshift(d); S.usage.quick++; save();
+  capMode=null; tab='home'; render(); toast('✅ 已存入，待补全');
+}
+function quickToGuided(){
+  var t=document.getElementById('q-text').value.trim();
+  if(!t){ toast('先写点什么，哪怕几个词。'); return; }
+  var d={id:uid(),createdAt:new Date().toISOString(),mode:'quick',status:'draft',
+    situation:t,domain:document.getElementById('q-domain').value||'其他',dtype:'decision',
+    options:[],reviews:[],emotions:[]};
+  S.decisions.unshift(d); S.usage.quick++; save();
+  startWizard(t,d.id);
+}
+
+/* ---------- 引导向导（五阶段） ---------- */
+var wiz=null;
+var WSTEPS=['倒出来','标注情绪','具体化','选项与预期','确认与承诺'];
+function startWizard(prefill,quickId){
+  wiz={step:1,quickId:quickId||null,situation:prefill||'',emotions:[],body:'',
+    state:{mood:3,stress:3,sleep:3,energy:3},domain:'',dtype:'decision',prediction:'',
+    options:[{name:'',expected:'',prob:''},{name:'',expected:'',prob:''}],chosen:'',
+    intuition:'',analysis:'',confidence:70,falsifier:'',reviewInDays:30};
+  capMode='guided';
+}
+function viewWizard(){
+  var w=wiz, pct=(w.step/5)*100;
+  var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<h2 style="margin:0">🧭 引导记录 · 第 '+w.step+'/5 步：'+WSTEPS[w.step-1]+'</h2>'
+    +'<button class="btn ghost sm" onclick="capMode=null;render()">退出</button></div>'
+    +'<div class="progress"><i style="width:'+pct+'%"></i></div>';
+  if(w.step===1){
+    h+='<label>你现在面对什么事情？打算怎么处理？</label>'
+      +'<textarea id="w-sit" style="min-height:120px" oninput="wiz.situation=this.value;onWizPM()">'+esc(w.situation)+'</textarea>'
+      +'<div id="w-pm">'+pmBoxHtml(w.situation,w.domain)+'</div>'
+      +'<div class="why">💡 为什么自由倾倒优先：先叙述再分析，防止过早框定问题（问题建构方式往往决定答案）。</div>';
+  } else if(w.step===2){
+    h+='<label>此刻的情绪（点选或自填，带强度 0-10）</label><div class="checks">'
+      +EMO_PRE.map(function(e){ var on=w.emotions.some(function(x){return x.name===e});
+        return '<label class="'+(on?'on':'')+'" onclick="toggleEmo(\''+e+'\')">'+(on?'✓ ':'')+e+'</label>';}).join('')
+      +'</div>'
+      +'<div style="margin-top:10px" id="emo-list">'+emoListHtml()+'</div>'
+      +'<div style="display:flex;gap:8px;margin-top:6px"><input type="text" id="emo-new" placeholder="自填情绪词，如「释然」">'
+      +'<button class="btn ghost sm" onclick="addEmo()">添加</button></div>'
+      +'<label>身体有什么感觉？（胸口发紧 / 胃里翻腾 / 肩膀发沉……可留空）</label>'
+      +'<textarea id="w-body" style="min-height:50px" oninput="wiz.body=this.value">'+esc(w.body)+'</textarea>'
+      +'<label>状态自评（1=很差，5=很好）</label>'
+      +stateSlider('mood','心情',w.state.mood)+stateSlider('stress','压力',w.state.stress)
+      +stateSlider('sleep','睡眠',w.state.sleep)+stateSlider('energy','精力',w.state.energy)
+      +'<div class="why">💡 情绪标注（affect labeling）：给情绪命名能降低杏仁核激活、恢复前额叶调控（Lieberman et al., 2007）。'
+      +'说不清感受 ≠ 没有感受——被无视的情绪会改道影响你的判断。</div>';
+  } else if(w.step===3){
+    h+='<label>这是"决策"还是"预测/判断"？</label><div class="radio-row">'
+      +'<label><input type="radio" name="dtype" '+(w.dtype==='decision'?'checked':'')+' onchange="wiz.dtype=this.value" value="decision">决策（要在选项里挑一个）</label>'
+      +'<label><input type="radio" name="dtype" '+(w.dtype==='prediction'?'checked':'')+' onchange="wiz.dtype=this.value" value="prediction">预测（判断某事会不会发生）</label></div>'
+      +'<label>属于哪个领域？</label><select onchange="wiz.domain=this.value;onWizPM()">'
+      +'<option value="">请选择</option>'+DOMAINS.map(function(d){return '<option '+(w.domain===d?'selected':'')+'>'+d+'</option>'}).join('')+'</select>'
+      +'<label>补充关键细节：涉及谁？时间窗口？硬约束是什么？最坏会怎样？</label>'
+      +'<textarea id="w-detail" style="min-height:90px" oninput="wiz.detail=this.value">'+esc(w.detail||'')+'</textarea>'
+      +'<div class="why">💡 预测类条目出结果快、样本量大，是校准训练的最佳燃料——别只记重大决策。</div>';
+  } else if(w.step===4){
+    h+='<div class="why">💡 第一反应 vs 慢分析双轨记录：积累几十条后，数据会告诉你自己在哪类问题上直觉可信。</div>';
+    if(w.dtype==='prediction'){
+      h+='<label>你的预测是什么？</label>'
+        +'<textarea id="w-pred" style="min-height:60px" oninput="wiz.prediction=this.value">'+esc(w.prediction)+'</textarea>'
+        +'<label>你判断它发生的概率（%）</label><div class="slider-row">'
+        +'<input type="range" min="5" max="95" value="'+w.confidence+'" oninput="wiz.confidence=+this.value;document.getElementById(\'w-conf-v\').textContent=this.value+\'%\'">'
+        +'<span class="slider-val" id="w-conf-v">'+w.confidence+'%</span></div>';
+    } else {
+      h+='<label>备选方案（至少 2 个。每个写清：选项名 / 预期结果 / 主观概率%）</label><div id="opt-wrap">'+optsHtml()+'</div>'
+        +'<button class="btn ghost sm" onclick="wiz.options.push({name:\'\',expected:\'\',prob:\'\'});render()">+ 添加选项</button>'
+        +'<label>你倾向于选哪个？</label><select onchange="wiz.chosen=this.value">'
+        +'<option value="">未定</option>'+w.options.map(function(o,i){return '<option value="'+i+'" '+(w.chosen==String(i)?'selected':'')+'>'+esc(o.name||('选项'+(i+1)))+'</option>'}).join('')+'</select>'
+        +'<label>整体置信度：你觉得自己的判断有多大把握是对的？（%）</label><div class="slider-row">'
+        +'<input type="range" min="5" max="95" value="'+w.confidence+'" oninput="wiz.confidence=+this.value;document.getElementById(\'w-conf-v\').textContent=this.value+\'%\'">'
+        +'<span class="slider-val" id="w-conf-v">'+w.confidence+'%</span></div>';
+    }
+    h+='<label>10 秒内的直觉答案（先别想，写出第一反应）</label>'
+      +'<textarea id="w-intu" style="min-height:50px" oninput="wiz.intuition=this.value">'+esc(w.intuition)+'</textarea>'
+      +'<label>慢分析的结论（权衡了什么？）</label>'
+      +'<textarea id="w-ana" style="min-height:70px" oninput="wiz.analysis=this.value">'+esc(w.analysis)+'</textarea>'
+      +'<label>🔴 可证伪承诺（必填）：什么证据出现，说明我错了？</label>'
+      +'<textarea id="w-fals" style="min-height:60px" oninput="wiz.falsifier=this.value" placeholder="例如：如果三个月内新部门没有给我任何资源承诺，说明我对这次机会的判断过于乐观">'+esc(w.falsifier)+'</textarea>'
+      +'<div class="why">💡 可证伪承诺是整个系统不被"事后合理化"污染的闸门——现在不写，复盘时你会给自己找一万条理由。</div>';
+  } else {
+    h+='<h3>确认这份记录</h3><div class="kv">'
+      +'<span class="k">类型</span><span>'+(w.dtype==='prediction'?'预测/判断':'决策')+'</span>'
+      +'<span class="k">领域</span><span>'+esc(w.domain)+'</span>'
+      +'<span class="k">情境</span><span>'+esc(trunc(w.situation,100))+'</span>'
+      +'<span class="k">情绪</span><span>'+(w.emotions.map(function(e){return e.name+'('+e.intensity+')'}).join('、')||'未记录')+'</span>'
+      +'<span class="k">'+(w.dtype==='prediction'?'预测':'倾向')+'</span><span>'+esc(w.dtype==='prediction'?w.prediction:(w.options[w.chosen]||{}).name||'未定')+'</span>'
+      +'<span class="k">置信度</span><span>'+w.confidence+'%</span>'
+      +'<span class="k">可证伪</span><span>'+esc(trunc(w.falsifier,80))+'</span>'
+      +'</div>'
+      +'<label>多久后提醒你复盘？</label><select onchange="wiz.reviewInDays=+this.value">'
+      +[3,7,14,30,90,180,365].map(function(n){return '<option value="'+n+'" '+(w.reviewInDays===n?'selected':'')+'>'+n+' 天后</option>'}).join('')+'</select>'
+      +'<div class="why">💡 保存后，事前部分（情境/预期/置信度/可证伪承诺）将锁定不可修改——这不是缺陷，是设计。'
+      +'防止未来的你篡改证据。</div>'
+      +'<button class="btn ok" style="margin-top:14px;width:100%" onclick="saveWizard()">🔒 锁定并保存</button>';
+  }
+  h+='<div class="steps-nav"><button class="btn ghost" onclick="wiz.step--;render()">← 上一步</button>'
+    +(w.step<5?'<button class="btn" onclick="wizNext()">下一步 →</button>':'<span></span>')+'</div>';
+  return h+'</div>';
+}
+function stateSlider(k,label,v){
+  return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="width:36px;font-size:12.5px;color:var(--t2)">'+label+'</span>'
+    +'<input type="range" min="1" max="5" value="'+v+'" style="flex:1" oninput="wiz.state.'+k+'=+this.value"> '
+    +'<span class="tiny" style="width:70px;text-align:right">'+['','很差','较差','一般','较好','很好'][v]+'</span></div>';
+}
+function emoListHtml(){
+  return wiz.emotions.map(function(e,i){
+    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:5px"><b style="width:56px;font-size:13px">'+esc(e.name)+'</b>'
+      +'<input type="range" min="0" max="10" value="'+e.intensity+'" style="flex:1" oninput="wiz.emotions['+i+'].intensity=+this.value;document.getElementById(\'ev-'+i+'\').textContent=this.value">'
+      +'<span style="width:24px;font-weight:700;color:var(--purple)" id="ev-'+i+'">'+e.intensity+'</span>'
+      +'<button class="btn ghost sm" onclick="wiz.emotions.splice('+i+',1);render()">✕</button></div>';}).join('');
+}
+function toggleEmo(name){
+  var i=wiz.emotions.findIndex(function(x){return x.name===name});
+  if(i>=0) wiz.emotions.splice(i,1); else wiz.emotions.push({name:name,intensity:5});
+  render();
+}
+function addEmo(){
+  var el=document.getElementById('emo-new'); var v=el.value.trim(); if(!v) return;
+  wiz.emotions.push({name:v,intensity:5}); render();
+}
+function optsHtml(){
+  return wiz.options.map(function(o,i){
+    return '<div class="opt-row"><button class="del" title="删除" onclick="wiz.options.splice('+i+',1);render()">✕</button>'
+      +'<div style="display:grid;grid-template-columns:1fr 2fr 80px;gap:8px">'
+      +'<input type="text" placeholder="选项名" value="'+esc(o.name)+'" oninput="wiz.options['+i+'].name=this.value">'
+      +'<input type="text" placeholder="预期结果" value="'+esc(o.expected)+'" oninput="wiz.options['+i+'].expected=this.value">'
+      +'<input type="number" placeholder="概率%" min="0" max="100" value="'+esc(o.prob)+'" oninput="wiz.options['+i+'].prob=this.value"></div></div>';}).join('');
+}
+function wizNext(){
+  var w=wiz;
+  if(w.step===1 && !w.situation.trim()){ toast('先把事情倒出来——哪怕是碎片。'); return; }
+  if(w.step===3 && !w.domain){ toast('请选择领域。'); return; }
+  if(w.step===4){
+    if(w.dtype==='decision'){
+      var named=w.options.filter(function(o){return o.name.trim()});
+      if(named.length<2){ toast('至少写 2 个有名字的选项。没有备选就不叫决策。'); return; }
+    }
+    if(!w.falsifier.trim()){ toast('可证伪承诺是必填项：什么证据出现，说明你错了？'); return; }
+  }
+  w.step++; render();
+}
+function saveWizard(){
+  var w=wiz;
+  if(!w.falsifier.trim()){ toast('可证伪承诺必填。'); return; }
+  var options;
+  if(w.dtype==='prediction'){
+    options=[{name:'预测成真',expected:w.prediction,prob:w.confidence},
+             {name:'预测落空',expected:'—',prob:100-w.confidence}];
+  } else {
+    options=w.options.filter(function(o){return o.name.trim()}).map(function(o){
+      return {name:o.name,expected:o.expected,prob:+o.prob||null};});
+  }
+  var d={id:uid(),createdAt:new Date().toISOString(),mode:'guided',status:'active',
+    dtype:w.dtype,domain:w.domain,situation:w.situation,detail:w.detail||'',
+    emotions:w.emotions,body:w.body,state:w.state,options:options,
+    chosen:w.dtype==='prediction'?'预测成真':(w.chosen!==''?w.chosen:null),
+    intuition:w.intuition,analysis:w.analysis,confidence:w.confidence,
+    falsifier:w.falsifier,reviewInDays:w.reviewInDays,reviews:[]};
+  S.decisions.unshift(d); S.usage.guided++;
+  if(w.quickId){
+    var qi=S.decisions.findIndex(function(x){return x.id===w.quickId});
+    if(qi>=0){ S.decisions.splice(qi,1); S.usage.quickDone++; }
+  }
+  save(); var nid=d.id; wiz=null; capMode=null; tab='home'; render(); toast('🔒 已锁定保存');
+  setTimeout(function(){ dqPrompt(nid); },600);
+}
+/* 保存后立刻问：现在做质量自检，还是以后再说。事前做才有意义。 */
+function dqPrompt(id){
+  var el=document.getElementById('modal-root'); if(!el) return;
+  el.innerHTML='<div class="modal-mask" onclick="if(event.target===this)closeModal()">'
+    +'<div class="modal" style="max-width:430px;padding:22px;text-align:center">'
+    +'<div style="font-size:30px">📐</div><h2 style="margin:6px 0">趁热做 30 秒质量自检？</h2>'
+    +'<p style="margin:4px 0 16px;font-size:13px;color:var(--t2)">六要素自检会直接告诉你<b>最弱环节</b>在哪一环。'
+    +'<b style="color:var(--red)">现在做还来得及改决定</b>——等决定落地之后再做，就只是自我评分了。</p>'
+    +'<div style="display:flex;gap:10px">'
+    +'<button class="btn ok" style="flex:1" onclick="closeModal();openDQ(\''+id+'\')">现在做</button>'
+    +'<button class="btn ghost" style="flex:1" onclick="closeModal()">先不了</button></div></div></div>';
+}
+
+/* ---------- AI 对话 ---------- */
+var chat={msgs:[],busy:false};
+/* 通用 AI 调用：OpenAI 兼容端点 → 解析 ```json``` 代码块 → 回调对象 */
+function aiPost(messages,cb,err){
+  fetch(S.settings.aiEndpoint,{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+S.settings.aiKey},
+    body:JSON.stringify({model:S.settings.aiModel,messages:messages,temperature:0.7})})
+  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(function(data){
+    var c=data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content;
+    if(!c) throw new Error('响应格式异常');
+    var m=String(c).match(/```json\s*([\s\S]*?)```/)||String(c).match(/```\s*([\s\S]*?)```/);
+    var j=null; if(m){ try{ j=JSON.parse(m[1]); }catch(e){} }
+    if(!j) throw new Error('AI 未输出可解析的 JSON');
+    cb(j);
+  })
+  .catch(function(e){ if(err) err(e); });
+}
+var AI_SYSTEM='你是"决策蒸馏"App的引导教练。你唯一的任务：通过对话帮助用户把一个正在面对的决策或判断记录下来。\n\n【纪律——违反即失败】\n1. 只提问、复述、澄清，绝不给建议，不评价用户的选择，不替用户做决定。\n2. 一次只问一个问题，每句尽量短。用户跑题就温和拉回。\n3. 用户说不清时用具体化追问："你说的X具体指什么？""能不能举个具体例子？"\n4. 语气平和克制，像苏格拉底式教练，不共情过度不鸡汤。\n\n【五阶段流程】\n阶段一·倒出来：问"你现在面对什么事情？想怎么处理？"让用户自由倾倒，不打断不评判。\n阶段二·标注情绪：问"此刻情绪和身体上有什么感觉？"逐个确认情绪词和强度(0-10)。\n阶段三·具体化：用5W澄清（谁/何时/约束/风险），确认这是"决策"还是"预测"。\n阶段四·选项与预期：让用户列出至少2个选项及各自预期结果与主观概率；问直觉答案和慢分析；问置信度(0-100)；必问"如果这个判断错了，最先出现的证据是什么？"\n阶段五·确认与承诺：复述结构化摘要请用户确认，问希望几天后复盘（3/7/14/30/90/180/365）。\n\n【输出格式】五阶段全部完成后，输出一段总结，然后输出一个JSON代码块（用三个反引号包住，标注json），字段如下：\n{"situation":"情境概述","domain":"职业发展|投资理财|人际关系|健康生活|消费购买|学习成长|其他","dtype":"decision或prediction","emotions":[{"name":"情绪词","intensity":0-10}],"body":"身体感受","options":[{"name":"选项名","expected":"预期结果","prob":0-100}],"chosen":"用户倾向的选项名","rationale":"用户的主要理由","intuition":"10秒直觉答案","analysis":"慢分析结论","confidence":0-100,"falsifier":"可证伪承诺","reviewInDays":30}\n如果信息缺失，字段填空字符串或空数组，不要编造。';
+function initChat(){ chat={msgs:[{role:'assistant',content:'你好。我是你的决策记录教练——我只提问，不给建议，决定永远是你自己做。\n\n你现在面对什么事情？想怎么处理？随便说，说不清楚也没关系，说清楚是我的工作。'}],busy:false}; }
+function viewChat(){
+  var aiOn=!!(S.settings.aiEndpoint&&S.settings.aiKey&&S.settings.aiModel);
+  var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    +'<h2 style="margin:0">🤖 AI 引导对话 · 五阶段协议</h2>'
+    +'<div><button class="btn ghost sm" onclick="capMode=null;render()">← 返回</button> '
+    +(aiOn?'<button class="btn ghost sm" onclick="initChat();render()">重开对话</button>':'')+'</div></div>';
+  if(!aiOn){
+    h+='<div class="alert amber"><div><b>未配置 AI</b><div class="tiny">设置页可接入任意 OpenAI 兼容端点（如 api.openai.com 或本地 Ollama http://localhost:11434/v1/chat/completions，隐私零外泄）。'
+      +'未配置时推荐使用功能等价的引导向导。</div></div><button class="btn sm" onclick="go(\'settings\')">去配置</button></div></div>';
+    return h;
+  }
+  h+='<div class="chat-box" id="chat-box">'+chat.msgs.map(function(m){
+      return '<div class="msg '+(m.role==='assistant'?'ai':'me')+'">'+esc(m.content)+'</div>';}).join('')+'</div>'
+    +'<div class="chat-input"><textarea id="chat-in" placeholder="想到什么说什么…" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>'
+    +'<button class="btn" id="chat-send" onclick="sendChat()" '+(chat.busy?'disabled':'')+'>'+(chat.busy?'…':'发送')+'</button></div>'
+    +'<p class="tiny" style="margin-top:8px">AI 只追问不建议 · 数据流向：仅你配置的端点 · 对话完成后自动生成结构化草稿</p></div>';
+  return h;
+}
+function sendChat(){
+  var el=document.getElementById('chat-in'); var t=el.value.trim(); if(!t||chat.busy) return;
+  el.value=''; chat.msgs.push({role:'user',content:t}); chat.busy=true; renderChatOnly();
+  var msgs=[{role:'system',content:AI_SYSTEM}].concat(chat.msgs);
+  fetch(S.settings.aiEndpoint,{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+S.settings.aiKey},
+    body:JSON.stringify({model:S.settings.aiModel,messages:msgs,temperature:0.6})})
+  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status+' — 检查端点/密钥/模型名'); return r.json(); })
+  .then(function(data){
+    var c=data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content;
+    if(!c) throw new Error('响应格式异常');
+    chat.msgs.push({role:'assistant',content:c}); chat.busy=false;
+    S.usage.ai++; save(); renderChatOnly();
+    var m=c.match(/```json\s*([\s\S]*?)```/);
+    if(m){ try{ var j=JSON.parse(m[1]); chatDraft=j; renderChatOnly(); }catch(e){} }
+  })
+  .catch(function(e){
+    chat.msgs.push({role:'assistant',content:'⚠️ 调用失败：'+e.message+'\n请到设置页检查配置。也可以先用引导向导完成这次记录。'});
+    chat.busy=false; renderChatOnly();
+  });
+}
+var chatDraft=null;
+function renderChatOnly(){
+  if(tab!=='capture'||capMode!=='ai'){ return; }
+  render();
+  var box=document.getElementById('chat-box'); if(box) box.scrollTop=box.scrollHeight;
+  if(chatDraft){
+    var d=chatDraft;
+    var h='<div class="card" style="border-color:var(--green)"><h3 style="color:var(--green)">✅ 对话完成 — 生成记录草稿</h3>'
+      +'<div class="kv">'
+      +'<span class="k">类型</span><span>'+esc(d.dtype==='prediction'?'预测':(d.dtype==='decision'?'决策':'—'))+' · '+esc(d.domain||'')+'</span>'
+      +'<span class="k">情境</span><span>'+esc(trunc(d.situation,120))+'</span>'
+      +'<span class="k">情绪</span><span>'+((d.emotions||[]).map(function(e){return esc(e.name)+'('+e.intensity+')'}).join('、')||'—')+'</span>'
+      +'<span class="k">倾向</span><span>'+esc(d.chosen||'未定')+'</span>'
+      +'<span class="k">置信度</span><span>'+esc(d.confidence)+'%</span>'
+      +'<span class="k">可证伪</span><span>'+esc(trunc(d.falsifier,100))+'</span>'
+      +'</div><p class="tiny" style="margin:8px 0">保存后事前部分锁定，'+ (d.reviewInDays||30) +'天后提醒复盘。</p>'
+      +'<button class="btn ok" onclick="saveAIDraft()">🔒 确认并保存</button> '
+      +'<button class="btn ghost" onclick="chatDraft=null;render()">不采用，继续对话</button></div>';
+    document.getElementById('view').insertAdjacentHTML('beforeend',h);
+    window.scrollTo(0,document.body.scrollHeight);
+  }
+}
+function saveAIDraft(){
+  var d=chatDraft; if(!d) return;
+  var dec={id:uid(),createdAt:new Date().toISOString(),mode:'ai',status:'active',
+    dtype:d.dtype==='prediction'?'prediction':'decision',domain:d.domain||'其他',
+    situation:d.situation||'',emotions:d.emotions||[],body:d.body||'',state:{},
+    options:(d.options&&d.options.length?d.options:[]).map(function(o){return {name:o.name,expected:o.expected,prob:o.prob}}),
+    chosen:d.chosen||null,intuition:d.intuition||'',analysis:d.analysis||'',
+    rationale:d.rationale||'',confidence:+d.confidence||70,falsifier:d.falsifier||'',
+    reviewInDays:+d.reviewInDays||30,reviews:[]};
+  if(!dec.situation){ toast('草稿缺情境，请在对话中补充。'); return; }
+  S.decisions.unshift(dec); save();
+  chatDraft=null; capMode=null; tab='home'; render(); toast('🔒 已锁定保存');
+}
+
+/* ---------- 决策考古：从历史材料回溯"结果已知"的决策 ---------- */
+var arc=null;
+function viewArc(){
+  if(!arc) arc={stage:'input',text:'',items:[],busy:false,n:0};
+  var aiOn=!!(S.settings.aiEndpoint&&S.settings.aiKey&&S.settings.aiModel);
+  var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<h2 style="margin:0">🧱 决策考古</h2><button class="btn ghost sm" onclick="capMode=null;arc=null;render()">← 返回</button></div>';
+  if(arc.stage==='input'){
+    h+='<div class="why">💡 你过去的日记、聊天记录、备忘录里埋着大量<b>结果已知</b>的决策——它们是真值样本，不用等未来。'
+      +'粘贴给 AI，它把"当时选了什么、后来怎样了"挖出来回溯建档。'
+      +'<b>考古记录不参与校准与过程分</b>（它们没有事前承诺），但进入模式统计与原则证据链。</div>';
+    if(!aiOn){
+      h+='<div class="alert amber"><div><b>需要配置 AI</b><div class="tiny">考古依赖 AI 从自由文本中提取结构化决策。设置页接入任意 OpenAI 兼容端点（含本地 Ollama）。</div></div>'
+        +'<button class="btn sm" onclick="go(\'settings\')">去配置</button></div>';
+    } else {
+      h+='<label>粘贴历史材料（日记 / 聊天记录 / 备忘录，500~20000 字）</label>'
+        +'<textarea id="arc-text" style="min-height:180px" oninput="arc.text=this.value" placeholder="例如粘贴一段日记或和朋友的聊天记录：包含当时面对什么事、你选了什么、后来结果如何……">'+esc(arc.text)+'</textarea>'
+        +'<p class="tiny" style="margin-top:6px">⚠️ 材料会发送到你配置的 AI 端点——介意隐私请使用本地模型（Ollama）。</p>'
+        +'<div style="margin-top:12px;display:flex;gap:8px">'
+        +'<button class="btn" onclick="arcExtract()" '+(arc.busy?'disabled':'')+'>'+(arc.busy?'⏳ AI 提取中…':'开始提取决策')+'</button></div>';
+    }
+  } else if(arc.stage==='review'){
+    var selN=arc.items.filter(function(x){return x.ok}).length;
+    h+='<h3>识别出 '+arc.items.length+' 条"结果已知"的决策</h3>'
+      +'<p class="tiny" style="margin-bottom:10px">逐条检查——AI 会认错人、认错事，勾掉不对的再导入。</p>';
+    arc.items.forEach(function(x,i){
+      h+='<div class="opt-row" style="'+(x.ok?'':'opacity:.5')+'">'
+        +'<div style="display:flex;gap:8px;align-items:flex-start">'
+        +'<input type="checkbox" style="margin-top:4px" '+(x.ok?'checked':'')+' onchange="arc.items['+i+'].ok=this.checked;render()">'
+        +'<div style="flex:1;min-width:0"><b style="font-size:13px">'+esc(trunc(x.situation,80))+'</b>'
+        +'<div class="tiny" style="margin-top:4px">'+(x.date?esc(x.date)+' · ':'')+esc(x.domain||'其他')+'</div>'
+        +'<div class="tiny" style="margin-top:4px">结果：'+esc(trunc(x.outcome,90))+'</div>'
+        +(x.lesson?'<div class="tiny" style="margin-top:2px">教训：'+esc(trunc(x.lesson,60))+'</div>':'')
+        +'</div></div></div>';
+    });
+    h+='<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">'
+      +'<button class="btn ok" onclick="arcImport()">导入选中的 '+selN+' 条</button>'
+      +'<button class="btn ghost" onclick="arc.stage=\'input\';render()">← 重新提取</button></div>';
+  } else if(arc.stage==='done'){
+    h+='<div style="text-align:center;padding:26px 10px"><div style="font-size:34px">🧱</div>'
+      +'<h2 style="margin:10px 0 6px">已导入 '+arc.n+' 条考古记录</h2>'
+      +'<p class="muted" style="max-width:440px;margin:0 auto 14px">它们标着「考古」徽章进入决策库：'
+      +'不进校准曲线、不进过程分（没有事前承诺的不算证据），但领域模式统计看得见它们，'
+      +'复盘教训也能提炼原则、挂证据链。</p>'
+      +'<button class="btn" onclick="capMode=null;arc=null;render()">完成</button></div>';
+  }
+  return h+'</div>';
+}
+function arcExtract(){
+  if(arc.busy) return;
+  if(!String(arc.text||'').trim()||arc.text.trim().length<50){ toast('材料太短——至少粘贴 50 字。'); return; }
+  arc.busy=true; render();
+  var sys='你是"决策蒸馏"App的决策考古助手。用户粘贴一段过去的历史材料（日记/聊天记录/备忘录），你从中识别出用户本人做过的、且结果已知的决策或判断，输出结构化数据。\n'
+    +'要求：\n1. 只收"用户做了选择或判断，且后来发生了可判定结果"的事件。还在进行中的、纯情绪抒发、别人的决定都不算。\n2. 结果写不出来的条目直接丢弃，宁缺毋滥。\n3. situation 用一两句概括当时的情境与用户的选择；outcome 用一两句写实际发生了什么；lesson 仅当材料里有明确反思时提取，否则留空。\n4. date 从材料推断，格式 YYYY-MM-DD，推断不出填 null。\n5. domain 只能从这些里选：职业发展/投资理财/人际关系/健康生活/消费购买/学习成长/其他。\n6. 最多 20 条，按时间正序。\n'
+    +'输出格式：一个 json 代码块（三个反引号标注 json）：{"items":[{"date":"YYYY-MM-DD或null","situation":"...","domain":"...","outcome":"...","lesson":"..."}]}，没有合适的就 {"items":[]}。';
+  aiPost([{role:'system',content:sys},{role:'user',content:arc.text.slice(0,20000)}],
+    function(j){
+      arc.busy=false;
+      arc.items=(j.items||[]).filter(function(x){return x&&x.situation&&x.outcome}).slice(0,20);
+      if(!arc.items.length){ arc.stage='input'; render();
+        toast('没识别出"结果已知"的决策——试试粘贴包含事件经过和结果的段落。',4200); return; }
+      arc.items.forEach(function(x){ x.ok=true; });
+      arc.stage='review'; render();
+    },
+    function(e){
+      arc.busy=false; render();
+      toast('提取失败：'+(e&&e.message?e.message:'网络/配置问题')+'。检查设置页 AI 配置后重试。',4200);
+    });
+}
+function arcImport(){
+  var sel=arc.items.filter(function(x){return x.ok});
+  if(!sel.length){ toast('至少勾选一条。'); return; }
+  sel.forEach(function(x){
+    var when=(x.date&&!isNaN(new Date(x.date).getTime()))?new Date(x.date).toISOString():new Date().toISOString();
+    var d={id:uid(),createdAt:when,mode:'archaeo',source:'archaeo',status:'reviewed',dtype:'decision',
+      domain:(DOMAINS.indexOf(x.domain)>=0?x.domain:'其他'),
+      situation:x.situation,detail:'',emotions:[],body:'',state:{},
+      options:[],chosen:null,intuition:'',analysis:'',rationale:'',
+      confidence:null,falsifier:'',reviewInDays:null,
+      reviews:[{date:when,outcome:x.outcome,expectedMatch:null,processScore:null,outcomeScore:null,
+        usedIntuition:null,biases:[],lesson:x.lesson||'',pf:[]}]};
+    S.decisions.unshift(d);
+  });
+  S.usage.arc=(S.usage.arc||0)+sel.length; save();
+  arc={stage:'done',n:sel.length,text:''}; render();
+  toast('🧱 已回溯建档 '+sel.length+' 条历史决策');
+}
+
+/* ================= 决策库 ================= */
+var libFilter={domain:'',status:'',q:''};
+function viewLibrary(){
+  var list=S.decisions.slice().sort(function(a,b){return a.createdAt<b.createdAt?1:-1});
+  if(libFilter.domain) list=list.filter(function(d){return d.domain===libFilter.domain});
+  if(libFilter.status==='draft') list=list.filter(function(d){return d.status==='draft'});
+  if(libFilter.status==='due') list=list.filter(function(d){return d.status==='active'&&d.reviewInDays!=null&&daysSince(d.createdAt)>=d.reviewInDays});
+  if(libFilter.status==='active') list=list.filter(function(d){return d.status==='active'&&!(d.reviewInDays!=null&&daysSince(d.createdAt)>=d.reviewInDays)});
+  if(libFilter.status==='reviewed') list=list.filter(function(d){return d.reviews&&d.reviews.length});
+  var q=libFilter.q.trim().toLowerCase();
+  if(q) list=list.filter(function(d){
+    var hay=[d.situation,d.detail,d.domain,d.falsifier,d.intuition,d.analysis,d.rationale]
+      .concat((d.reviews||[]).map(function(r){return r.outcome+' '+(r.lesson||'')}))
+      .join(' ').toLowerCase();
+    return hay.indexOf(q)>=0; });
+  return '<div class="card"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'
+    +'<h2 style="margin:0;margin-right:auto">决策库（'+list.length+'）</h2>'
+    +'<select onchange="libFilter.domain=this.value;render()" style="width:auto"><option value="">全部领域</option>'
+    +DOMAINS.map(function(d){return '<option '+(libFilter.domain===d?'selected':'')+'>'+d+'</option>'}).join('')+'</select>'
+    +'<select onchange="libFilter.status=this.value;render()" style="width:auto"><option value="">全部状态</option>'
+    +'<option value="due" '+(libFilter.status==='due'?'selected':'')+'>待复盘</option>'
+    +'<option value="active" '+(libFilter.status==='active'?'selected':'')+'>进行中</option>'
+    +'<option value="reviewed" '+(libFilter.status==='reviewed'?'selected':'')+'>已复盘</option>'
+    +'<option value="draft" '+(libFilter.status==='draft'?'selected':'')+'>待补全</option></select></div>'
+    +'<div class="search-wrap" style="margin-bottom:12px"><input type="text" id="lib-q" placeholder="全文搜索：情境 / 教训 / 可证伪承诺…（快捷键 /）" '
+    +'value="'+esc(libFilter.q)+'" oninput="libFilter.q=this.value;refreshList()"></div>'
+    +'<div id="lib-list">'+(list.length?list.map(listItem).join(''):'<p class="muted">暂无匹配记录</p>')+'</div></div>';
+}
+function refreshList(){
+  var q=(document.getElementById('lib-q')||{value:''}).value;
+  libFilter.q=q;
+  var list=S.decisions.slice().sort(function(a,b){return a.createdAt<b.createdAt?1:-1});
+  if(libFilter.domain) list=list.filter(function(d){return d.domain===libFilter.domain});
+  if(libFilter.status==='draft') list=list.filter(function(d){return d.status==='draft'});
+  if(libFilter.status==='due') list=list.filter(function(d){return d.status==='active'&&d.reviewInDays!=null&&daysSince(d.createdAt)>=d.reviewInDays});
+  if(libFilter.status==='active') list=list.filter(function(d){return d.status==='active'&&!(d.reviewInDays!=null&&daysSince(d.createdAt)>=d.reviewInDays)});
+  if(libFilter.status==='reviewed') list=list.filter(function(d){return d.reviews&&d.reviews.length});
+  var qq=q.trim().toLowerCase();
+  if(qq) list=list.filter(function(d){
+    var hay=[d.situation,d.detail,d.domain,d.falsifier,d.intuition,d.analysis,d.rationale]
+      .concat((d.reviews||[]).map(function(r){return r.outcome+' '+(r.lesson||'')}))
+      .join(' ').toLowerCase();
+    return hay.indexOf(qq)>=0; });
+  var el=document.getElementById('lib-list');
+  if(el) el.innerHTML=list.length?list.map(listItem).join(''):'<p class="muted">暂无匹配记录</p>';
+}
+
+/* ---------- 详情 ---------- */
+function openDetail(id){
+  var d=S.decisions.find(function(x){return x.id===id}); if(!d) return;
+  var h='<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    +'<button class="close" onclick="closeModal()">✕</button><h2>'+(d.dtype==='prediction'?'预测记录':'决策记录')+' <span class="tag blue">'+esc(d.domain)+'</span></h2>'
+    +'<p class="tiny">'+fmtFull(d.createdAt)+' · '+modeName(d.mode)+' · '+(d.status==='draft'?'待补全':(d.reviews&&d.reviews.length?'已复盘':'进行中'))+'</p>'
+    +'<div class="kv" style="margin-top:12px">'
+    +kv('情境',d.situation)+kv('补充细节',d.detail)
+    +'<span class="k">情绪/身体</span><span>'+((d.emotions||[]).map(function(e){return esc(e.name)+'('+e.intensity+')'}).join('、')
+      +(d.body?'；身体：'+esc(d.body):'')||'—')+'</span>'
+    +'<span class="k">状态</span><span>'+st(d.state)+'</span>'
+    +'<span class="k">选项与预期</span><span>'+((d.options||[]).map(function(o,i){
+        var ck=(d.chosen==String(i)||d.chosen===o.name)?' <b style="color:var(--blue)">←倾向</b>':'';
+        return '<div>'+(i+1)+'. '+esc(o.name)+(o.prob!=null&&o.prob!==''?'（'+o.prob+'%）':'')+'：'+esc(o.expected||'—')+ck+'</div>';}).join('')||'—')+'</span>'
+    +kv('直觉答案',d.intuition)+kv('慢分析',d.analysis)+kv('主要理由',d.rationale)
+    +'<span class="k">置信度</span><span><b>'+(d.confidence!=null?d.confidence+'%':'—（考古记录）')+'</b></span>'
+    +'<span class="k">🔴 可证伪</span><span style="color:var(--red)">'+esc(d.falsifier||'未填写')+'</span>'
+    +'<span class="k">复盘计划</span><span>'+ (d.reviewInDays?d.reviewInDays+' 天后':'—')
+      +(d.status==='active'&&d.reviewInDays&&daysSince(d.createdAt)>=d.reviewInDays?' <span class="tag red">已到期</span>':'')+'</span>'
+    +'</div>';
+  if(d.dq){
+    var w=dqWeakest(d), sc=dqScore(d);
+    h+='<div class="opt-row" style="margin-top:10px;background:var(--purple-l);border-color:#ddd0f0">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+      +'<b style="font-size:13px">📐 决策质量 '+sc+' / 100</b>'
+      +'<span class="tiny">最弱环节：<b style="color:var(--red)">'+w.n+'</b>（'+d.dq[w.k]+'）</span></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">'
+      +DQ_KEYS.map(function(x){ var v=d.dq[x.k];
+        var c=v>=80?'var(--green)':(v>=60?'#c07800':'var(--red)');
+        return '<div class="tiny"><span style="color:var(--t3)">'+x.n+'</span> '
+          +'<span style="color:'+c+';font-weight:700">'+v+'</span></div>';}).join('')
+      +'</div></div>';
+  }
+  (d.reviews||[]).forEach(function(r,i){
+    h+='<div class="opt-row" style="margin-top:10px"><b>复盘 '+(i+1)+' · '+fmtFull(r.date)+'</b>'
+      +'<div class="kv" style="margin-top:6px">'
+      +kv('实际结果',r.outcome)
+      +'<span class="k">过程分/结果分</span><span>'+((r.processScore!=null?r.processScore:'—')+' / '+(r.outcomeScore!=null?r.outcomeScore:'—'))+'</span>'
+      +'<span class="k">预期符合</span><span>'+({'yes':'相符','no':'不符','part':'部分相符'}[r.expectedMatch]||'—')+'</span>'
+      +'<span class="k">靠什么执行</span><span>'+({'intuition':'直觉','analysis':'分析','mix':'混合'}[r.usedIntuition]||'—')+'</span>'
+      +(r.biases&&r.biases.length?'<span class="k">识别偏差</span><span>'+r.biases.map(esc).join('、')+'</span>':'')
+      +kv('教训',r.lesson)
+      +((r.pf||[]).length?'<span class="k">原则检验</span><span>'+r.pf.map(function(f){
+          var p=S.principles.find(function(x){return x.id===f.pid});
+          return (f.ok?'<span style="color:var(--green)">✓ 遵守</span>':'<span style="color:var(--red)">✗ 违背</span>')
+            +' '+esc(trunc(p?p.ifText:'（已删除的原则）',30));}).join('<br>')+'</span>':'')
+      +'</div></div>';
+  });
+  h+='<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">';
+  if(d.status==='draft') h+='<button class="btn" onclick="completeDraft(\''+d.id+'\')">🧭 补全记录</button>';
+  else if(d.status==='active') h+='<button class="btn ok" onclick="openReview(\''+d.id+'\')">⏰ 复盘</button>';
+  else h+='<button class="btn ghost" onclick="openReview(\''+d.id+'\')">再复盘一次</button>';
+  if(d.status==='active'&&d.reviewInDays!=null) h+='<button class="btn ghost" onclick="icsOne(\''+d.id+'\')">📅 加入日历</button>';
+  h+='<button class="btn ghost" onclick="closeModal();openDQ(\''+d.id+'\')">📐 '+(d.dq?'重做质量自检':'质量自检 30 秒')+'</button>';
+  h+='<button class="btn ghost" onclick="closeModal();openBoard(\''+d.id+'\')">🩺 '+(d.boards&&d.boards.length?'再来一次会诊':'多方会诊')+'</button>';
+  h+='<button class="btn ghost" style="color:var(--red)" onclick="delDecision(\''+d.id+'\')">删除</button></div></div></div>';
+  document.getElementById('modal-root').innerHTML=h;
+}
+function kv(k,v){ return '<span class="k">'+k+'</span><span>'+ (v?esc(v):'—')+'</span>'; }
+function completeDraft(id){
+  var d=S.decisions.find(function(x){return x.id===id}); if(!d) return;
+  closeModal(); startWizard(d.situation, d.id); tab='capture'; render();
+}
+function st(s){ if(!s||!s.mood) return '—';
+  return '心情 '+['','很差','较差','一般','较好','很好'][s.mood]+' · 压力 '+['','很小','较小','中等','较大','很大'][s.stress]+' · 睡眠 '+['','很差','较差','一般','较好','很好'][s.sleep]; }
+function delDecision(id){
+  confirmBox('确定删除？该决策及其复盘、原则关联将一并移除。',function(){
+    S.decisions=S.decisions.filter(function(d){return d.id!==id});
+    S.principles.forEach(function(p){ p.cases=p.cases.filter(function(c){return c!==id}); });
+    save(); closeModal(); render(); toast('已删除');
+  });
+}
+
+/* ================= 复盘 ================= */
+var rvTmp=null;
+function openReview(id){
+  var d=S.decisions.find(function(x){return x.id===id}); if(!d) return;
+  rvTmp={id:id,outcome:'',expectedMatch:'yes',processScore:6,outcomeScore:6,usedIntuition:'mix',biases:[],lesson:'',pf:{}};
+  showReviewModal();
+}
+function showReviewModal(){ document.getElementById('modal-root').innerHTML=reviewModalHtml(); }
+function reviewModalHtml(){
+  var d=S.decisions.find(function(x){return x.id===rvTmp.id});
+  var candP=candPrinciples(d);
+  var h='<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    +'<button class="close" onclick="closeModal()">✕</button><h2>⏰ 复盘：'+esc(trunc(d.situation,30))+'</h2>'
+    +'<div class="opt-row" style="background:var(--blue-l);border-color:#c9dff2"><b>事前锁定区（不可修改）</b>'
+    +'<div class="kv" style="margin-top:6px">'
+    +kv('当时的倾向',(d.options&&d.options.length?(d.chosen!=null?(d.chosen==='预测成真'||/^\d+$/.test(d.chosen)?(d.options[+d.chosen]||{name:d.chosen}).name:d.chosen):'未定'):'—'))
+    +'<span class="k">置信度</span><span>'+d.confidence+'%</span>'
+    +kv('预期',d.options&&d.options.map(function(o){return esc(o.name)+'：'+esc(o.expected||'—')}).join('；'))
+    +'<span class="k">🔴 可证伪</span><span>'+esc(d.falsifier||'—')+'</span></div></div>'
+    +'<label>实际发生了什么？</label><textarea id="rv-outcome" style="min-height:70px" oninput="rvTmp.outcome=this.value"></textarea>'
+    +'<label>结果与当时预期相比？</label><div class="radio-row">'
+    +[['yes','相符'],['part','部分相符'],['no','不符']].map(function(x){
+      return '<label><input type="radio" name="rv-em" '+(rvTmp.expectedMatch===x[0]?'checked':'')+' onchange="rvTmp.expectedMatch=\''+x[0]+'\'">'+x[1]+'</label>';}).join('')+'</div>'
+    +'<div class="why">💡 过程分与结果分分开打：好决策可能撞上坏运气，坏决策也可能侥幸成功（resulting bias）。系统只优化过程分。</div>'
+    +'<label>过程分：单看当时的思考过程（信息搜集、逻辑、对反方的考量），打几分？</label>'
+    +sliderRv('processScore',rvTmp.processScore)
+    +'<label>结果分：单看结果好坏打几分？</label>'
+    +sliderRv('outcomeScore',rvTmp.outcomeScore)
+    +'<label>实际执行时，你更多靠直觉还是分析？</label><div class="radio-row">'
+    +[['intuition','直觉'],['mix','混合'],['analysis','分析']].map(function(x){
+      return '<label><input type="radio" name="rv-ui" '+(rvTmp.usedIntuition===x[0]?'checked':'')+' onchange="rvTmp.usedIntuition=\''+x[0]+'\'">'+x[1]+'</label>';}).join('')+'</div>'
+    +'<label>这次踩了哪些认知偏差？（诚实勾选，这是金矿）</label><div class="checks" id="rv-biases">'
+    +BIASES.map(function(b){return '<label onclick="toggleBias(\''+b.replace(/'/g,"\\'")+'\')">'+b+'</label>';}).join('')+'</div>'
+    +'<label>一句话教训</label><textarea id="rv-lesson" style="min-height:55px" oninput="rvTmp.lesson=this.value"></textarea>';
+  if(candP.length){
+    h+='<label>这条决策检验了你的哪些原则？（诚实勾选——<b>违背率</b>才是一条原则的真实强度）</label>'
+      +'<div class="why">💡 一条原则如果在 10 次相关情境中被违背 8 次，它就不是原则，是愿望。这是让原则从文字变成可证伪系统的关键一步。</div>';
+    candP.forEach(function(p){
+      var st=rvTmp.pf[p.id];
+      h+='<div class="pf-row"><div style="flex:1"><span class="tiny">IF '+esc(trunc(p.ifText,42))+'</span></div>'
+        +'<button class="pf-btn '+(st===1?'ok':'')+'" onclick="setPF(\''+p.id+'\',1)">'+(st===1?'✓ ':'')+'遵守</button>'
+        +'<button class="pf-btn '+(st===0?'no':'')+'" onclick="setPF(\''+p.id+'\',0)">'+(st===0?'✗ ':'')+'违背</button></div>';
+    });
+  }
+  h+='<div style="margin-top:16px;display:flex;gap:8px">'
+    +'<button class="btn ok" onclick="saveReview()">保存复盘</button>'
+    +'<button class="btn" onclick="saveReview(true)">保存并提炼原则 →</button></div></div></div>';
+  return h;
+}
+/* 候选原则：同领域优先，不足 5 条时补全部 */
+function candPrinciples(d){
+  if(!S.principles.length) return [];
+  var same=S.principles.filter(function(p){return p.domain&&d.domain&&p.domain===d.domain});
+  if(same.length>=5) return same;
+  var rest=S.principles.filter(function(p){return same.indexOf(p)<0});
+  return same.concat(rest).slice(0,6);
+}
+function setPF(pid,val){
+  if(rvTmp.pf[pid]===val) delete rvTmp.pf[pid]; else rvTmp.pf[pid]=val;
+  showReviewModal();
+}
+function sliderRv(k,v){
+  return '<div class="slider-row"><input type="range" min="1" max="10" value="'+v+'" '
+    +'oninput="rvTmp.'+k+'=+this.value;document.getElementById(\'rv-'+k+'\').textContent=this.value">'
+    +'<span class="slider-val" id="rv-'+k+'">'+v+'</span></div>';
+}
+function toggleBias(b){
+  var i=rvTmp.biases.indexOf(b);
+  if(i>=0) rvTmp.biases.splice(i,1); else rvTmp.biases.push(b);
+  var labels=document.getElementById('rv-biases').querySelectorAll('label');
+  labels.forEach(function(l){ var t=l.textContent.replace(/^✓ /,'');
+    l.className=rvTmp.biases.indexOf(t)>=0?'on':''; l.textContent=(rvTmp.biases.indexOf(t)>=0?'✓ ':'')+t; });
+}
+function saveReview(toPrinciple){
+  if(!rvTmp.outcome.trim()){ toast('写下实际发生了什么——哪怕一句。'); return; }
+  var d=S.decisions.find(function(x){return x.id===rvTmp.id});
+  d.reviews=d.reviews||[];
+  var pfArr=Object.keys(rvTmp.pf).map(function(pid){return {pid:pid,ok:rvTmp.pf[pid]}});
+  d.reviews.push({date:new Date().toISOString(),outcome:rvTmp.outcome,expectedMatch:rvTmp.expectedMatch,
+    processScore:rvTmp.processScore,outcomeScore:rvTmp.outcomeScore,usedIntuition:rvTmp.usedIntuition,
+    biases:rvTmp.biases.slice(),lesson:rvTmp.lesson,pf:pfArr});
+  d.status='reviewed'; S.usage.reviews++; save();
+  closeModal(); render(); toast('✅ 复盘已保存');
+  if(toPrinciple) openPrinciple(null,rvTmp.id,rvTmp.lesson);
+}
+
+/* ================= 原则库 ================= */
+/* 种子原则：外部经典打底（方法论冷启动第 6 条的落地）。
+   安装后与自建原则进入同一套违背率检验——长期违背的种子原则说明不适合你，删掉即可。 */
+var SEEDS=[
+ {src:'达利欧《原则》',domain:'其他',
+  ifText:'我处在高情绪状态（愤怒/焦虑/兴奋）且面对不可逆的决定',
+  thenText:'强制延迟 24 小时，并先找一个反对者听他讲完再定'},
+ {src:'达利欧《原则》· 可信度加权',domain:'其他',
+  ifText:'我要采信一条意见（包括我自己的直觉）',
+  thenText:'先查发表者在 Results 个领域的可验证战绩，战绩决定权重'},
+ {src:'芒格 · 反向思考',domain:'其他',
+  ifText:'我在想"这件事怎么做才能成"',
+  thenText:'先反过来问"怎么做必然失败"，把失败清单倒过来当检查表'},
+ {src:'塔勒布 · 尾部风险',domain:'投资理财',
+  ifText:'一个机会的收益看起来很诱人',
+  thenText:'先问最坏情况会不会把我击穿——会击穿的，收益再高也不碰'},
+ {src:'可证伪性（本系统核心）',domain:'其他',
+  ifText:'我做出一个重要判断或预测',
+  thenText:'当场写下"什么证据出现说明我错了"，结果出来后回去对账'},
+ {src:'10/10/10 法则',domain:'其他',
+  ifText:'我在两个选项间纠结',
+  thenText:'问三个问题：10 分钟后、10 个月后、10 年后我分别会怎么看这个选择'},
+ {src:'基准率先行（外部视角）',domain:'其他',
+  ifText:'我觉得"我这次不一样 / 我是个例外"',
+  thenText:'先查"这类事通常怎么收场"的基准率，再谈我的特殊情况'},
+ {src:'沉没成本清零',domain:'其他',
+  ifText:'我在犹豫要不要继续已投入很多的事情',
+  thenText:'把过去的投入清零，只比较"从今天起"的成本与收益'},
+ {src:'睡眠与决策（神经科学）',domain:'健康生活',
+  ifText:'我睡眠不足或连续高压时面对重要决定',
+  thenText:'推迟决定——那不是最好的我，先恢复状态'},
+ {src:'Steelman 最强反方',domain:'其他',
+  ifText:'我已经倾向某个选项、准备拍板',
+  thenText:'先把这个选项的最强反对意见写出来，写不出来就不算想清楚'}
+];
+function seedInstalled(s){ return S.principles.some(function(p){return p.source==='seed'&&p.ifText===s.ifText}); }
+function installSeed(i){
+  var s=SEEDS[i]; if(!s) return;
+  if(seedInstalled(s)){ toast('这条已安装过。'); return; }
+  S.principles.unshift({id:uid(),ifText:s.ifText,thenText:s.thenText,rationale:s.src,
+    domain:s.domain,source:'seed',createdAt:new Date().toISOString(),cases:[],versions:[]});
+  S.usage.seed=(S.usage.seed||0)+1; save(); render();
+  toast('🌱 已安装。它会和你的原则一样进入违背率检验——检验几次后见真章。');
+}
+function seedsHtml(){
+  return '<div class="card"><h2>🌱 种子原则库</h2>'
+    +'<p class="muted" style="margin-bottom:10px">冷启动期的外部经典（达利欧 / 芒格 / 塔勒布…）。安装后与自建原则同一套检验——'
+    +'<b>长期违背的种子原则说明它不适合你，删掉</b>，这本身就是一次校准。</p>'
+    +SEEDS.map(function(s,i){
+      var on=seedInstalled(s);
+      return '<div class="opt-row"><div style="flex:1"><b style="color:var(--purple)">IF</b> '+esc(s.ifText)
+        +'<br><b style="color:var(--green)">THEN</b> '+esc(s.thenText)
+        +'<div class="tiny" style="margin-top:4px">'+esc(s.domain)+' · 来源：'+esc(s.src)+'</div></div>'
+        +(on?'<span class="tag green">已安装</span>'
+          :'<button class="btn sm" onclick="installSeed('+i+')">安装</button>')+'</div>';
+    }).join('')+'</div>';
+}
+function viewPrinciples(){
+  if(!S.principles.length && S.decisions.filter(function(d){return d.reviews&&d.reviews.length}).length<3){
+    return '<div class="card" style="text-align:center;padding:40px 20px"><div style="font-size:32px">📜</div>'
+      +'<h2 style="margin:10px 0 6px">原则库尚未解锁</h2>'
+      +'<p class="muted" style="max-width:480px;margin:0 auto 6px">延迟蒸馏：前 20~30 条只诚实记录。同一类情境出现 3 次以上，'
+      +'模式才可信——太早蒸馏出来的只是噪音。</p>'
+      +'<p class="tiny">当前已复盘 '+S.decisions.filter(function(d){return d.reviews&&d.reviews.length}).length+' 条 / 解锁门槛 ≥3 条复盘，攒到 20+ 条后蒸馏的原则更可信</p>'
+      +'<div style="margin-top:14px"><button class="btn ghost" onclick="openPrinciple()">提前新建一条（不推荐但允许）</button></div></div>'
+      +seedsHtml();   /* 种子不受延迟蒸馏门槛约束：它们是外部经典，不是从你的噪音里蒸出来的 */
+  }
+  var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<h2 style="margin:0">原则库（'+S.principles.length+'）</h2>'
+    +'<button class="btn sm" onclick="openPrinciple()">+ 新原则</button></div>';
+  if(!S.principles.length) h+='<p class="muted">还没有原则。在复盘时点"保存并提炼原则"，原则会自动挂上案例证据链。</p>';
+  h+=S.principles.map(function(p){
+    var st=pStats(p);
+    var badge='';
+    if(st.total===0) badge='<span class="pf-badge none">未检验</span>';
+    else {
+      var pct=Math.round(st.rate*100);
+      var cls = st.total>=5&&pct>=50 ? 'bad' : (pct>=30?'warn':'good');
+      badge='<span class="pf-badge '+cls+'">检验 '+st.total+' 次 · 违背 '+pct+'%</span>'
+        +(st.total>=5&&pct>=50?'<div class="tiny" style="color:var(--red);margin-top:4px">⚠️ 违背率过半：这更像愿望，不是原则。要么改成做得到的，要么承认它不是。</div>':'');
+    }
+    return '<div class="opt-row"><div style="flex:1"><b style="color:var(--purple)">IF</b> '+esc(p.ifText)
+      +'<br><b style="color:var(--green)">THEN</b> '+esc(p.thenText)
+      +'<div class="tiny" style="margin-top:6px">'+esc(p.domain)+' · v'+p.versions.length+' · 挂 '+(p.cases.length)+' 个案例'
+      +(p.source==='seed'?' · 🌱 种子：'+esc(trunc(p.rationale,30)):(p.rationale?' · 依据：'+esc(trunc(p.rationale,40)):''))+' '+badge+'</div></div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px">'
+      +'<button class="btn ghost sm" onclick="openPrinciple(\''+p.id+'\')">查看/演进</button></div></div>';
+  }).join('');
+  h+='</div>'+seedsHtml();
+  return h;
+}
+/* 原则违背率统计 */
+function pStats(p){
+  var hit=0,miss=0;
+  S.decisions.forEach(function(d){ (d.reviews||[]).forEach(function(r){
+    (r.pf||[]).forEach(function(f){ if(f.pid===p.id){ if(f.ok) hit++; else miss++; } }); }); });
+  var t=hit+miss;
+  return {hit:hit,miss:miss,total:t,rate:t?miss/t:0};
+}
+/* 整体原则执行力 = 1 - 总违背率 */
+function pfScore(){
+  var hit=0,miss=0;
+  S.decisions.forEach(function(d){ (d.reviews||[]).forEach(function(r){
+    (r.pf||[]).forEach(function(f){ if(f.ok) hit++; else miss++; }); }); });
+  var t=hit+miss;
+  return t? {score:Math.round(hit/t*100),n:t} : null;
+}
+var pTmp=null;
+function openPrinciple(pid,caseId,prefill){
+  var p=pid?S.principles.find(function(x){return x.id===pid}):null;
+  pTmp={id:pid,caseId:caseId||null,ifText:p?p.ifText:(prefill?'遇到类似情境（补全）：'+prefill:''),
+    thenText:p?p.thenText:'',rationale:p?p.rationale:'',domain:p?p.domain:'其他',changeReason:''};
+  var h='<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    +'<button class="close" onclick="closeModal()">✕</button>'
+    +'<h2>'+(p?'原则演进（当前 v'+p.versions.length+'）':'新建原则')+'</h2>'
+    +'<div class="why">💡 执行意图（implementation intention）研究显示：if-then 格式的原则比抽象格言的执行率显著更高（Gollwitzer, 1999）。</div>'
+    +'<label>IF — 什么情境？（具体、可识别）</label><textarea id="p-if" style="min-height:55px" oninput="pTmp.ifText=this.value">'+esc(pTmp.ifText)+'</textarea>'
+    +'<label>THEN — 那么做什么？</label><textarea id="p-then" style="min-height:55px" oninput="pTmp.thenText=this.value">'+esc(pTmp.thenText)+'</textarea>'
+    +'<label>依据（来自哪个案例/教训？）</label><textarea id="p-why" style="min-height:50px" oninput="pTmp.rationale=this.value">'+esc(pTmp.rationale)+'</textarea>'
+    +'<label>领域</label><select onchange="pTmp.domain=this.value">'+DOMAINS.map(function(d){return '<option '+(pTmp.domain===d?'selected':'')+'>'+d+'</option>'}).join('')+'</select>'
+    +(p?'<label style="color:var(--red)">变更理由（必填，进入版本史）</label><textarea id="p-cr" style="min-height:45px" oninput="pTmp.changeReason=this.value"></textarea>':'')
+    +(p?'<h3 style="margin-top:14px">版本演进</h3>'+p.versions.map(function(v){
+      return '<div class="tiny" style="border-left:2px solid var(--line);padding-left:10px;margin-bottom:6px">v'+v.v+'（'+fmtDate(v.at)+'）IF '+esc(trunc(v.ifText,50))+' → THEN '+esc(trunc(v.thenText,50))
+      +(v.changeReason?'<br><i>变更理由：'+esc(v.changeReason)+'</i>':'')+'</div>';}).join('')
+      +(p.cases.length?'<h3 style="margin-top:12px">案例证据链</h3>'+p.cases.map(function(cid){
+        var d=S.decisions.find(function(x){return x.id===cid});
+        return d?'<div class="list-item" style="padding:8px 12px" onclick="openDetail(\''+d.id+'\')"><span class="tiny">📎 '+esc(trunc(d.situation,36))+'</span></div>':'';}).join(''):''):'')
+    +'<div style="margin-top:16px"><button class="btn ok" onclick="savePrinciple()">'+(p?'保存新版本':'创建原则')+'</button></div>'
+    +'</div></div>';
+  document.getElementById('modal-root').innerHTML=h;
+}
+function savePrinciple(){
+  if(!pTmp.ifText.trim()||!pTmp.thenText.trim()){ toast('IF 和 THEN 都要填写。'); return; }
+  if(pTmp.id){
+    var p=S.principles.find(function(x){return x.id===pTmp.id});
+    if(!pTmp.changeReason.trim()){ toast('修改原则必须写变更理由——版本史是原则可信度的根基。'); return; }
+    p.versions.push({v:p.versions.length+1,ifText:pTmp.ifText,thenText:pTmp.thenText,changeReason:pTmp.changeReason,at:new Date().toISOString()});
+    p.ifText=pTmp.ifText;p.thenText=pTmp.thenText;p.rationale=pTmp.rationale;p.domain=pTmp.domain;
+    toast('已保存为 v'+p.versions.length);
+  } else {
+    S.principles.unshift({id:uid(),ifText:pTmp.ifText,thenText:pTmp.thenText,rationale:pTmp.rationale,
+      domain:pTmp.domain,createdAt:new Date().toISOString(),cases:pTmp.caseId?[pTmp.caseId]:[],versions:[]});
+    toast('✅ 原则已创建');
+  }
+  save(); closeModal(); render();
+}
+
+/* ================= 训练场 ================= */
+var trainMode=null;
+function viewTraining(){
+  var h='<div class="card"><h2>训练场</h2>'
+    +'<p class="muted" style="margin-bottom:12px">真实决策样本太稀、反馈太慢，所以训练场用<b>代理样本</b>把冷启动期从 1~2 年压到 1 个月。'
+    +'<span style="color:var(--red)">代理样本与真实决策分开统计，永不混合</span>——它们只练概率手感，不能当原则的证据。</p>'
+    +'<h3 style="margin-top:6px">快轨 · 立刻有数据</h3><div class="grid g3">'
+    +'<div class="mode-card" onclick="startAssess()"><div class="ico">🧪</div><h3>决策素养测评</h3>'
+    +'<p class="tiny">15 题 · 一次性 · 立刻得到五维雷达图与训练处方</p></div>'
+    +'<div class="mode-card" onclick="trainMode=\'fcst\';render()"><div class="ico">🎯</div><h3>预测训练 · Brier</h3>'
+    +'<p class="tiny">记录概率判断，到期揭晓，自动算 Brier 分与校准分</p></div>'
+    +'<div class="mode-card" onclick="startSJT()"><div class="ico">🚦</div><h3>情境卡 · 30 秒</h3>'
+    +'<p class="tiny">12 道决策陷阱题，即时告诉你踩了哪些坑</p></div>'
+    +'</div><h3 style="margin-top:6px">慢轨 · 用你自己的历史</h3><div class="grid g3">'
+    +'<div class="mode-card" onclick="startReplay()"><div class="ico">🎭</div><h3>盲测回放</h3><p class="tiny">重历当时的情境（隐藏结果），对比"现在的我 vs 当时的我"。</p></div>'
+    +'<div class="mode-card" onclick="startFC()"><div class="ico">🃏</div><h3>原则闪卡 · 间隔重复</h3><p class="tiny">'+(fcDue().length?fcDue().length+' 张到期待复习。':'情境在正面，原则在背面，按遗忘曲线排期。')+'</p></div>'
+    +'<div class="mode-card" onclick="trainMode=\'cal\';render()"><div class="ico">📊</div><h3>校准曲线</h3><p class="tiny">你以为的 70% 把握，实际命中率是多少？（仅真实决策）</p></div>'
+    +'</div></div>';
+  if(trainMode==='replay') h+=replayHtml();
+  if(trainMode==='fc') h+=fcHtml();
+  if(trainMode==='cal') h+=calHtml();
+  if(trainMode==='assess') h+=assessHtml();
+  if(trainMode==='assessResult') h+=assessResultHtml();
+  if(trainMode==='fcst') h+=forecastHtml();
+  if(trainMode==='sjt') h+=sjtHtml();
+  return h;
+}
+var rp=null;
+function startReplay(){
+  var pool=S.decisions.filter(function(d){return d.reviews&&d.reviews.length&&d.options&&d.options.length>=2});
+  if(!pool.length){ toast('盲测回放需要至少 1 条已复盘、含 2 个以上选项的决策。先去记录和复盘。'); return; }
+  var d=pool[Math.floor(Math.random()*pool.length)];
+  rp={d:d,pick:null,confidence:70,done:false};
+  trainMode='replay'; render();
+}
+function replayHtml(){
+  var d=rp.d;
+  if(!rp.done){
+    return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      +'<h2 style="margin:0">🎭 盲测回放</h2><button class="btn ghost sm" onclick="trainMode=null;render()">退出</button></div>'
+      +'<p class="tiny">'+fmtFull(d.createdAt)+' · '+esc(d.domain)+' · 你的当时答案与结果已隐藏</p>'
+      +'<div class="opt-row" style="margin-top:10px;background:var(--amber-l);border-color:#efd9b0"><b>情境（只看事前信息）</b>'
+      +'<p style="font-size:13px;margin-top:6px;white-space:pre-wrap">'+esc(d.situation)+'</p>'
+      +(d.detail?'<p class="tiny" style="margin-top:4px">'+esc(d.detail)+'</p>':'')+'</div>'
+      +'<label>如果是现在的你，会怎么选/怎么判断？</label>'
+      +d.options.map(function(o,i){ return '<div class="list-item" style="cursor:pointer;'+(rp.pick===i?'border-color:var(--blue);background:var(--blue-l)':'')+'" onclick="rp.pick='+i+';render()"><span>'+esc(o.name)+'</span>'+(rp.pick===i?'<span class="tag blue">已选</span>':'')+'</div>';}).join('')
+      +'<label>你的置信度（%）</label><div class="slider-row">'
+      +'<input type="range" min="5" max="95" value="'+rp.confidence+'" oninput="rp.confidence=+this.value;document.getElementById(\'rp-cv\').textContent=this.value+\'%\'">'
+      +'<span class="slider-val" id="rp-cv">'+rp.confidence+'%</span></div>'
+      +'<button class="btn" style="margin-top:14px" onclick="submitReplay()" '+(rp.pick==null?'disabled':'')+'>揭晓答案</button></div>';
+  }
+  var same=(rp.pick!=null)&&(d.chosen==String(rp.pick)||d.chosen===d.options[rp.pick].name||(d.dtype==='prediction'&&rp.pick===0));
+  var last=d.reviews[d.reviews.length-1];
+  return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<h2 style="margin:0">🎭 回放揭晓</h2><button class="btn ghost sm" onclick="trainMode=null;render()">退出</button></div>'
+    +'<div class="kv">'
+    +'<span class="k">现在的你</span><span>'+esc(d.options[rp.pick].name)+'（置信 '+rp.confidence+'%）</span>'
+    +'<span class="k">当时的你</span><span>'+esc(d.chosen!=null?(d.options[+d.chosen]||{name:d.chosen}).name:'未定')+'（置信 '+d.confidence+'%）</span>'
+    +'<span class="k">一致吗</span><span>'+(same?'<span class="tag green">一致</span>':'<span class="tag amber">改变了</span>')+'</span>'
+    +'<span class="k">实际结果</span><span>'+esc(trunc(last.outcome,120))+'</span>'
+    +'<span class="k">当时过程分</span><span>'+last.processScore+'/10</span>'
+    +'<span class="k">当时的教训</span><span>'+esc(trunc(last.lesson,120))+'</span>'
+    +'</div><div class="why" style="margin-top:12px">💡 三方对比：直觉的我 vs 当时的我 vs 原则的我。不一致本身就是信号——'
+    +'要么你成长了，要么当时的判断里有你现在还缺的信息。值得回决策库细看。</div>'
+    +'<button class="btn" style="margin-top:8px" onclick="startReplay()">再来一题</button></div>';
+}
+function submitReplay(){
+  if(rp.pick==null) return;
+  var d=rp.d;
+  var same=(d.chosen==String(rp.pick)||d.chosen===d.options[rp.pick].name||(d.dtype==='prediction'&&rp.pick===0));
+  S.replays.push({decisionId:d.id,picked:rp.pick,same:same,confidence:rp.confidence,at:new Date().toISOString()});
+  S.usage.replays++; save(); rp.done=true; render();
+}
+var fc=null;
+/* 到期待复习的原则（从未复习过的视为到期） */
+function fcDue(){ return S.principles.filter(function(p){
+  var st=S.fcStats[p.id]; return !st || !st.due || st.due<=Date.now(); }); }
+function startFC(){
+  if(!S.principles.length){ toast('原则库还是空的——先在复盘中提炼，或到原则库安装种子原则。'); return; }
+  var due=fcDue();
+  var pool=due.length?due:S.principles;
+  fc={queue:pool.map(function(p){return p.id}), idx:0, flip:false, doneN:0, reN:0};
+  trainMode='fc'; render();
+}
+function fcHtml(){
+  if(fc.idx>=fc.queue.length){
+    return '<div class="card" style="text-align:center;padding:26px 20px"><div style="font-size:32px">🃏</div>'
+      +'<h2 style="margin:10px 0 6px">本轮完成</h2>'
+      +'<p class="muted">过了 '+fc.doneN+' 张，其中 '+fc.reN+' 张答错已重新排队。'
+      +'答错的卡片升不进下一级盒子，本轮内还会再见到它。</p>'
+      +'<div style="display:flex;gap:8px;justify-content:center;margin-top:12px">'
+      +'<button class="btn" onclick="startFC()">再来一轮</button>'
+      +'<button class="btn ghost" onclick="trainMode=null;render()">退出</button></div></div>';
+  }
+  var p=S.principles.find(function(x){return x.id===fc.queue[fc.idx]});
+  var st=S.fcStats[p.id]||{easy:0,hard:0,box:1,due:0};
+  var IV_LABEL=['','明天','3 天后','1 周后','16 天后','35 天后'];
+  return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    +'<h2 style="margin:0">🃏 原则闪卡 · '+(fc.idx+1)+'/'+fc.queue.length+'</h2>'
+    +'<button class="btn ghost sm" onclick="trainMode=null;render()">退出</button></div>'
+    +'<p class="tiny" style="margin-bottom:10px">间隔重复（Leitner）：答对进阶盒子、间隔拉长；答错回盒子 1 并重新排队。'
+    +'此卡：盒子 L'+(st.box||1)+' · 战绩 '+st.easy+' 记得 / '+st.hard+' 想不起来</p>'
+    +'<div class="fc-card" onclick="fc.flip=!fc.flip;render()">'
+    +(fc.flip?
+      '<div class="big"><b style="color:var(--green)">THEN</b><br>'+esc(p.thenText)+'</div>'
+      +(p.rationale?'<p class="tiny" style="margin-top:10px">依据：'+esc(trunc(p.rationale,80))+'</p>':'')
+      :'<div class="big"><b style="color:var(--purple)">IF</b><br>'+esc(p.ifText)+'</div><p class="tiny" style="margin-top:10px">点击翻面</p>')
+    +'</div>'
+    +(fc.flip?'<div style="display:flex;gap:10px;margin-top:12px">'
+      +'<button class="btn ok" style="flex:1" onclick="fcStat(\''+p.id+'\',true)">记得 ✓（下次 '+(IV_LABEL[Math.min(5,(st.box||1)+1)]||'')+'）</button>'
+      +'<button class="btn warn" style="flex:1" onclick="fcStat(\''+p.id+'\',false)">想不起来（回盒子1，稍后再见）</button></div>'
+      :'<p class="tiny" style="text-align:center;margin-top:10px">先在心里答出 THEN，再翻面对照</p>')
+    +'</div>';
+}
+function fcStat(pid,easy){
+  var st=S.fcStats[pid]||{easy:0,hard:0,box:1,due:0};
+  if(easy){ st.easy++; S.usage.fcEasy++; fc.doneN++; st.box=Math.min(5,(st.box||1)+1); }
+  else { st.hard++; S.usage.fcHard++; fc.doneN++; fc.reN++; st.box=1; fc.queue.push(pid); /* 本轮稍后重放 */ }
+  var IV=[0,1,3,7,16,35];
+  st.due=Date.now()+(IV[st.box]||1)*86400000;
+  S.fcStats[pid]=st; save(); fc.idx++; fc.flip=false; render();
+}
+function calHtml(){
+  var rs=[]; S.decisions.forEach(function(d){
+    if(d.source==='archaeo') return;   /* 考古记录没有事前承诺，不进校准 */
+    if(d.reviews&&d.reviews.length&&d.confidence!=null){
+      var last=d.reviews[d.reviews.length-1];
+      if(last.expectedMatch){
+        var c=d.confidence, hit=last.expectedMatch==='yes';
+        if(c<50){ c=100-c; hit=!hit; }   /* 说"30%会发生"= 对反面下 70%，对称换算 */
+        rs.push({conf:c,hit:hit});
+      } } });
+  var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<h2 style="margin:0">📊 校准曲线</h2><button class="btn ghost sm" onclick="trainMode=null;render()">退出</button></div>';
+  if(rs.length<5){
+    h+='<p class="muted">已复盘 '+rs.length+' 条（含预期对比）。至少 5 条后开始呈现曲线，'
+      +'每个置信度区间约需 30 个样本才有统计意义——在那之前，把它当"方向性自我觉察"而非结论。</p></div>';
+    return h;
+  }
+  var buckets=[[50,59],[60,69],[70,79],[80,89],[90,100]];
+  h+='<p class="muted" style="margin-bottom:12px">样本 '+rs.length+' 条 · 每桶标注样本量（<10 时仅供参考）</p>';
+  buckets.forEach(function(b){
+    var grp=rs.filter(function(r){return r.conf>=b[0]&&r.conf<=b[1]});
+    if(!grp.length){ h+='<div class="bar-wrap"><div class="bar-line"><span style="width:52px">'+b[0]+'-'+b[1]+'%</span><div class="bar"><i style="width:0"></i></div><span class="tiny" style="width:120px">无样本</span></div></div>'; return; }
+    var hit=Math.round(100*grp.filter(function(r){return r.hit}).length/grp.length);
+    var avg=Math.round(grp.reduce(function(a,r){return a+r.conf},0)/grp.length);
+    var note=(grp.length<10?' <span class="tag amber">n='+grp.length+' 不足</span>':' n='+grp.length);
+    h+='<div class="bar-wrap"><div class="bar-line"><span style="width:52px">'+b[0]+'-'+b[1]+'%</span>'
+      +'<div class="bar"><i style="width:'+hit+'%;background:'+(hit>=avg-10?'var(--green)':'var(--red)')+'"></i></div>'
+      +'<span style="width:150px" class="tiny">自报均值 '+avg+'% / 实际命中 '+hit+'%'+note+'</span></div></div>';
+  });
+  h+='<div class="why">💡 绿条=校准良好区间（命中≈自报），红条=偏差。系统性高估自己（命中<自报）通常出现在你情绪化或熟悉的领域。</div></div>';
+  return h;
+}
+
+/* ================= 决策素养测评（15 题 · 五维） ================= */
+var ASSESS_ITEMS=[
+ {t:'crt',q:'球棒和球共 1.10 元，球棒比球贵 1.00 元。球多少钱？（单位：元）',kind:'num',ans:0.05},
+ {t:'crt',q:'5 台机器 5 分钟做 5 个零件。100 台机器做 100 个零件要几分钟？',kind:'num',ans:5},
+ {t:'crt',q:'睡莲叶每天面积翻倍，第 48 天铺满整个湖。铺满一半是第几天？',kind:'num',ans:47},
+ {t:'num',q:'抛一枚均匀硬币 1000 次，正面朝上的次数最可能是：',kind:'c3',opts:['恰好 500 次','接近 500 次，但不必恰好','完全无法确定'],ans:1},
+ {t:'num',q:'1000 张奖券中有 1 张中奖，你买 5 张，中奖概率最接近：',kind:'c3',opts:['0.5%','5%','50%'],ans:0},
+ {t:'num',q:'袋中 1 红 9 白，每次抽完放回，抽 10 次，抽到红球的期望次数是：',kind:'c3',opts:['1 次','5 次','10 次'],ans:0},
+ {t:'frm',q:'600 人遇险。方案 A：确定救活 200 人。方案 B：1/3 概率救活 600 人，2/3 概率无人获救。你选：',kind:'c2',opts:['A','B'],ans:0},
+ {t:'frm',q:'600 人遇险。方案 C：确定死亡 400 人。方案 D：1/3 概率无人死亡，2/3 概率死亡 600 人。你选：',kind:'c2',opts:['C','D'],ans:0},
+ {t:'sunk',q:'你花 800 元买了演唱会门票。当天暴雨且你身体很不舒服，票款已不可退。你会：',kind:'c2',opts:['仍然去，钱都花了','不去，只看当下的成本和身体状况'],ans:1},
+ {t:'sunk',q:'项目已投入 6 个月精力，但越来越多信号显示方向错了。你倾向：',kind:'c2',opts:['继续投入，否则前面的努力全白费','只比较未来的成本与收益，过去的投入不计入'],ans:1},
+ {t:'cal',q:'光从太阳传播到地球大约需要 8 分钟。',kind:'bool',ans:1},
+ {t:'cal',q:'成年人全身共有 206 块骨头。',kind:'bool',ans:1},
+ {t:'cal',q:'马里亚纳海沟最深处超过 11000 米。',kind:'bool',ans:0},
+ {t:'cal',q:'成年蓝鲸的平均体重超过 150 吨。',kind:'bool',ans:0},
+ {t:'cal',q:'中国陆地面积约 960 万平方公里。',kind:'bool',ans:1}
+];
+var assessAns={};
+function startAssess(){
+  assessAns={}; ASSESS_ITEMS.forEach(function(it,i){
+    assessAns[i]= it.kind==='bool'?{yn:null,conf:70}:null; });
+  trainMode='assess'; render();
+}
+function assessHtml(){
+  var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+    +'<h2 style="margin:0">🧪 决策素养测评（15 题）</h2><button class="btn ghost sm" onclick="trainMode=null;render()">退出</button></div>'
+    +'<div class="why">💡 依据：认知反思测验 CRT（Frederick 2005）、成人决策能力测验 A-DMC（Bruine de Bruin 2007）、'
+    +'框架效应（Tversky & Kahneman 1981）、概率校准（Tetlock）。15 分钟一次性，立刻拿到基线画像。</div>';
+  ASSESS_ITEMS.forEach(function(it,i){
+    h+='<div class="opt-row"><b style="font-size:12.5px">'+ (i+1) +'. '+esc(it.q)+'</b>';
+    if(it.kind==='num'){
+      h+='<div style="display:flex;gap:8px;align-items:center"><input type="number" step="any" value="'+(assessAns[i]==null?'':assessAns[i])
+        +'" oninput="assessAns['+i+']=this.value===\'\'?null:parseFloat(this.value)" placeholder="填数字"></div>';
+    } else if(it.kind==='bool'){
+      h+='<div class="radio-row"><label><input type="radio" name="ab'+i+'" '+(assessAns[i].yn==='y'?'checked':'')
+        +' onchange="assessAns['+i+'].yn=\'y\'">是</label><label><input type="radio" name="ab'+i+'" '
+        +(assessAns[i].yn==='n'?'checked':'')+' onchange="assessAns['+i+'].yn=\'n\'">否</label></div>'
+        +'<div class="slider-row"><span class="tiny" style="width:60px">你的把握</span><input type="range" min="50" max="100" value="'+assessAns[i].conf
+        +'" oninput="assessAns['+i+'].conf=+this.value;document.getElementById(\'ac'+i+'\').textContent=this.value+\'%\'">'
+        +'<span class="slider-val" id="ac'+i+'">'+assessAns[i].conf+'%</span></div>';
+    } else {
+      h+='<div class="radio-row">'+it.opts.map(function(o,j){
+        return '<label><input type="radio" name="a'+i+'" '+(assessAns[i]===j?'checked':'')
+          +' onchange="assessAns['+i+']='+j+'">'+esc(o)+'</label>';}).join('')+'</div>';
+    }
+    h+='</div>';
+  });
+  h+='<button class="btn ok" style="margin-top:10px;width:100%" onclick="submitAssess()">生成我的决策画像</button></div>';
+  return h;
+}
+function submitAssess(){
+  var raw={crt:[],num:[],frm:[],sunk:[],cal:[]}, missed=0;
+  ASSESS_ITEMS.forEach(function(it,i){
+    var a=assessAns[i];
+    if(it.kind==='num'){ if(a==null||a===''){missed++;return;} raw[it.t].push(Math.abs(a-it.ans)<0.006?1:0); }
+    else if(it.kind==='bool'){
+      if(a.yn==null){missed++;return;}
+      var p=(a.yn==='y'?a.conf:100-a.conf);
+      raw.cal.push(Math.pow((p-(it.ans?100:0))/100,2));   /* 平方误差 = Brier 口径 */
+    }
+    else if(it.t==='frm'){ if(a==null){missed++;return;} raw.frm.push(a); }
+    else { if(a==null){missed++;return;} raw[it.t].push(a===it.ans?1:0); }
+  });
+  if(missed>0){ toast('还有 '+missed+' 题没填，请补完再生成画像。'); return; }
+  var mean=function(a){ return a.length? a.reduce(function(x,y){return x+y},0)/a.length : 0; };
+  /* 框架免疫 = 两次同构问题的选择不被表述方式改变（Tversky & Kahneman 1981）。
+     两次都选确定项（A+C）或两次都选风险项（B+D）都算免疫——风险取向本身无对错。 */
+  var av=raw.frm[0], cv=raw.frm[1];
+  var frmConsistent = raw.frm.length>=2 && av===cv;
+  var scores={
+    crt: Math.round(100*mean(raw.crt)),
+    num: Math.round(100*mean(raw.num)),
+    frm: frmConsistent?100:0,
+    sunk: Math.round(100*mean(raw.sunk)),
+    cal: Math.round(Math.max(0,100-200*mean(raw.cal)))
+  };
+  var keys=['crt','num','frm','sunk','cal'];
+  var total=Math.round(keys.reduce(function(a,k){return a+scores[k]},0)/keys.length);
+  S.assess={date:new Date().toISOString(),scores:scores,total:total,
+    orientation:(av===0?'规避风险':'偏好冒险'),all:raw};
+  S.assessHist.push({date:S.assess.date,total:total,scores:scores});
+  if(S.assessHist.length>10) S.assessHist.shift();
+  S.usage.assess=(S.usage.assess||0)+1; save();
+  trainMode='assessResult'; render(); toast('✅ 画像已生成');
+}
+function assessResultHtml(){
+  var A=S.assess; if(!A) return '';
+  var L={crt:'反思速度',num:'概率数感',frm:'框架免疫',sunk:'沉没抵抗',cal:'概率校准'};
+  var keys=['crt','num','frm','sunk','cal'];
+  var vals=keys.map(function(k){return A.scores[k]});
+  var labels=keys.map(function(k){return L[k]});
+  var minK=keys[0],maxK=keys[0];
+  keys.forEach(function(k){ if(A.scores[k]<A.scores[minK]) minK=k; if(A.scores[k]>A.scores[maxK]) maxK=k; });
+  var ADVICE={
+    crt:'第一反应太快。凡是带数字的判断，先动手算一遍再回答——多花 10 秒，正确率差别很大。',
+    num:'概率表达是弱项。从今天起，禁止自己说"可能会/大概"，一律改成具体百分比。',
+    frm:'你的选择会被"怎么说"影响。对策：把每个选项先翻译成同一口径（比如统一成"存活人数"或"死亡人数"）再比较。',
+    sunk:'你会被已投入的东西拖住。决策时只问一句：从今天起，这件事还值得吗？过去的投入不算。',
+    cal:'你的自信程度与真实命中率有偏差。每天 5 题概率训练，一个月就能明显收紧。'
+  };
+  var h='<div class="card"><h2>🧪 我的决策画像</h2>'
+    +'<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">'
+    +radarSvg(vals,labels)
+    +'<div style="flex:1;min-width:190px"><div class="kv">'
+    +keys.map(function(k){return '<span class="k">'+L[k]+'</span><span><b style="color:'+(A.scores[k]>=70?'var(--green)':A.scores[k]>=40?'var(--amber)':'var(--red)')+'">'+A.scores[k]+'</b>/100</span>';}).join('')
+    +'<span class="k">总评</span><span><b style="font-size:16px">'+A.total+'</b>/100 · '+(A.total>=75?'判断力强，可直接进入真实决策记录':A.total>=50?'基础尚可，先做一周快轨训练':'先补齐基础，别急着蒸馏原则')+'</span>'
+    +'<span class="k">风险取向</span><span>'+esc(A.orientation)+'</span></div></div></div>'
+    +'<div class="why" style="margin-top:10px">🎯 最弱环节 <b>'+L[minK]+'</b>（'+A.scores[minK]+'分）：'+ADVICE[minK]+'</div>'
+    +(S.assessHist.length>1?'<p class="tiny" style="margin-top:8px">📈 第 '+S.assessHist.length+' 次测评 · 上次总分 '+S.assessHist[S.assessHist.length-2].total+' → 本次 '+A.total+'</p>':'')
+    +'<p class="tiny">最强环节：'+L[maxK]+'（'+A.scores[maxK]+'分）。测评日期：'+fmtFull(A.date)+''
+    +' · 风险取向无对错，只描述偏好。'
+    +'<span style="color:var(--t3)">量表依据：CRT（Frederick 2005）、A-DMC（Bruine de Bruin 2007）、框架效应（Tversky & Kahneman 1981）、概率校准（Tetlock）</span></p>'
+    +'<div class="alert amber" style="margin-top:8px"><div class="tiny">⚠️ 单次测评信度有限：每维度仅 1~5 题。把五维图当<b>方向参考</b>而非结论——30 天后重测，看的是变化量，不是绝对分。</div></div>'
+    +'<div style="display:flex;gap:8px;margin-top:10px"><button class="btn ghost sm" onclick="startAssess()">重测一次</button>'
+    +'<button class="btn sm" onclick="trainMode=\'fcst\';render()">开始预测训练 →</button></div></div>';
+  return h;
+}
+function radarSvg(vals,labels){
+  var cx=100,cy=102,R=68,n=vals.length,pts=[],axes='',rings='',lab='';
+  for(var i=0;i<n;i++){
+    var ang=-Math.PI/2+i*2*Math.PI/n;
+    var r=R*Math.max(6,vals[i])/100;
+    pts.push((cx+r*Math.cos(ang)).toFixed(1)+','+(cy+r*Math.sin(ang)).toFixed(1));
+    var lx=cx+(R+16)*Math.cos(ang), ly=cy+(R+14)*Math.sin(ang);
+    lab+='<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" dominant-baseline="central" font-size="10.5" fill="#5f6470">'+esc(labels[i])+'</text>';
+    axes+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+R*Math.cos(ang)).toFixed(1)+'" y2="'+(cy+R*Math.sin(ang)).toFixed(1)+'" stroke="#e3e5e8" stroke-width="0.6"/>';
+  }
+  [25,50,75,100].forEach(function(lv){
+    var p=[]; for(var i=0;i<n;i++){ var a=-Math.PI/2+i*2*Math.PI/n, r=R*lv/100; p.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1)); }
+    rings+='<polygon points="'+p.join(' ')+'" fill="none" stroke="#e3e5e8" stroke-width="0.6"/>';
+  });
+  return '<svg viewBox="0 0 200 200" style="width:100%;max-width:240px;flex:0 0 auto">'+rings+axes
+    +'<polygon points="'+pts.join(' ')+'" fill="rgba(24,95,165,.15)" stroke="#185fa5" stroke-width="1.3"/>'+lab+'</svg>';
+}
+
+/* ================= 预测训练（Brier / 校准 · 代理轨） ================= */
+var FC_TEMPLATES=[
+ '本周我能在 23:00 前睡觉的天数 ≥4 天吗',
+ '本周我会主动联系 ≥2 个新机会吗',
+ '这次投递/提案能在 7 天内收到对方回复吗',
+ '本月我的支出会超过预算吗',
+ '这次 30 分钟的运动计划我能完成 ≥3 次吗',
+ '下周的会议能在预定时间内结束吗',
+ '我承诺的这件事会在承诺日期前完成吗',
+ '这周我会有 ≥1 天完全不看手机超过 3 小时吗'
+];
+var fNew={p:60};
+function addForecast(){
+  var q=document.getElementById('fq-q').value.trim();
+  if(!q){ toast('先写一句可判定的问题。'); return; }
+  var days=+document.getElementById('fq-days').value;
+  S.forecasts.unshift({id:uid(),q:q,p:fNew.p,due:new Date(Date.now()+days*86400000).toISOString(),
+    createdAt:new Date().toISOString(),outcome:null});
+  S.usage.forecasts=(S.usage.forecasts||0)+1; save(); render(); toast('已加入题集');
+}
+function fillForecast(t){ var el=document.getElementById('fq-q'); if(el) el.value=t; }
+function resolveForecast(id,outcome){
+  var f=S.forecasts.find(function(x){return x.id===id}); if(!f) return;
+  f.outcome=outcome; f.resolvedAt=new Date().toISOString(); save(); render();
+  toast('Brier 得分 '+((( f.p/100)-outcome)*(( f.p/100)-outcome)).toFixed(3)+'（越小越好）');
+}
+function delForecast(id){ S.forecasts=S.forecasts.filter(function(f){return f.id!==id}); save(); render(); }
+function fcStats(){
+  var done=S.forecasts.filter(function(f){return f.outcome!==null});
+  if(!done.length) return null;
+  var brier=0,absErr=0;
+  done.forEach(function(f){ var e=(f.p/100)-f.outcome; brier+=e*e; absErr+=Math.abs(e); });
+  var n=done.length;
+  /* 校准桶：p<50 的预测换算成"反面事件 + 100-p"，否则低概率预测者整条曲线隐身 */
+  var cal=done.map(function(f){ var p=f.p,o=f.outcome; if(p<50){ p=100-p; o=1-o; } return {p:p,o:o}; });
+  var buckets=[[50,59],[60,69],[70,79],[80,89],[90,100]].map(function(b){
+    var g=cal.filter(function(f){return f.p>=b[0]&&f.p<=b[1]});
+    return {lo:b[0],hi:b[1],n:g.length,hit:g.length?Math.round(100*g.filter(function(f){return f.o===1}).length/g.length):null,
+      avg:g.length?Math.round(g.reduce(function(a,f){return a+f.p},0)/g.length):null};
+  });
+  return {n:n,open:S.forecasts.filter(function(f){return f.outcome===null}).length,
+    brier:brier/n,cal:Math.max(0,Math.round(100-200*(absErr/n))),buckets:buckets};
+}
+function forecastHtml(){
+  var st=fcStats();
+  var open=S.forecasts.filter(function(f){return f.outcome===null}).sort(function(a,b){return a.due<b.due?-1:1});
+  var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+    +'<h2 style="margin:0">🎯 预测训练 · 代理轨</h2><button class="btn ghost sm" onclick="trainMode=null;render()">退出</button></div>'
+    +'<div class="why">💡 这是<b>训练燃料，不是你的真实战绩</b>。每天 1 题，30 天就有 30 个样本——真实决策一年才 30 条。'
+    +'题源可以是外部公开题（Good Judgment Open / Metaculus 的短周期问题），也可以是你自己的日常（下面有模板）。</div>';
+  h+='<label>新问题（写成可判定的二选一）</label><input type="text" id="fq-q" placeholder="例如：本周我能在 23:00 前睡觉的天数 ≥4 天吗">'
+    +'<label>你判断它发生的概率（%）</label><div class="slider-row">'
+    +'<input type="range" min="5" max="95" value="'+fNew.p+'" oninput="fNew.p=+this.value;document.getElementById(\'fq-v\').textContent=this.value+\'%\'">'
+    +'<span class="slider-val" id="fq-v">'+fNew.p+'%</span></div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><select id="fq-days" style="width:auto">'
+    +[3,7,14,30,60].map(function(n){return '<option value="'+n+'">'+n+' 天后揭晓</option>'}).join('')+'</select>'
+    +'<button class="btn sm" onclick="addForecast()">加入题集</button></div>'
+    +'<p class="tiny" style="margin-top:8px">点模板直接填入：'
+    +'<span class="checks" style="margin-top:4px">'+FC_TEMPLATES.map(function(t){
+      return '<label onclick="fillForecast(\''+t.replace(/'/g,"\\'")+'\')">'+esc(trunc(t,22))+'</label>';}).join('')+'</span></p>';
+  if(open.length){
+    h+='<h3 style="margin-top:14px">待揭晓（'+open.length+'）</h3>';
+    open.forEach(function(f){
+      var left=Math.ceil((new Date(f.due).getTime()-Date.now())/86400000);
+      h+='<div class="opt-row"><div style="flex:1"><b style="font-size:13px">'+esc(f.q)+'</b>'
+        +'<div class="tiny">你判断 <b>'+f.p+'%</b> · '+(left<=0?'可揭晓':'还剩 '+left+' 天')+'</div></div>'
+        +'<button class="btn ghost sm" onclick="delForecast(\''+f.id+'\')">删</button></div>'
+        +(left<=0?'<div style="display:flex;gap:8px;margin-bottom:10px"><button class="btn sm ok" onclick="resolveForecast(\''+f.id+'\',1)">发生了</button>'
+          +'<button class="btn sm" onclick="resolveForecast(\''+f.id+'\',0)">没发生</button></div>':'');
+    });
+  }
+  if(st){
+    h+='<h3 style="margin-top:14px">我的预测战绩（代理轨 · '+st.n+' 条已揭晓）</h3>'
+      +'<div class="grid g2" style="margin-bottom:10px">'
+      +stat(st.brier.toFixed(3),'Brier 分数（0=完美，0.25=抛硬币）')
+      +stat(st.cal,'校准分（100=完全校准）')+'</div>';
+    st.buckets.forEach(function(b){
+      if(!b.n){ h+='<div class="bar-wrap"><div class="bar-line"><span style="width:52px">'+b.lo+'-'+b.hi+'%</span><div class="bar"><i style="width:0"></i></div><span class="tiny">无样本</span></div></div>'; return; }
+      h+='<div class="bar-wrap"><div class="bar-line"><span style="width:52px">'+b.lo+'-'+b.hi+'%</span>'
+        +'<div class="bar"><i style="width:'+b.hit+'%;background:'+(b.hit>=b.avg-10?'var(--green)':'var(--red)')+'"></i></div>'
+        +'<span class="tiny">自报 '+b.avg+'% / 实际 '+b.hit+'%'+(b.n<10?' <span class="tag amber">n='+b.n+'</span>':' n='+b.n)+'</span></div></div>';
+    });
+    h+='<div class="why" style="margin-top:10px">💡 Brier 分数参考：&lt;0.10 优秀 · 0.10~0.20 良好 · 0.25 ≈ 抛硬币 · &gt;0.30 说明概率表达需要重练。'
+      +'这条曲线用的是<b>代理题</b>，与决策库里的真实校准曲线分开看。</div>';
+  } else {
+    h+='<p class="muted" style="margin-top:12px">还没有已揭晓的预测。加 5 题，3~7 天后回来看第一张校准曲线。</p>';
+  }
+  return h+'</div>';
+}
+
+/* ================= 情境卡（12 道决策陷阱题） ================= */
+var SJT_DECK=[
+ {d:'职业',q:'你偶然得到一个大客户提案机会，准备期只有 3 天，而手上还有两个常规项目要交付。',
+  opts:['全力投入提案，机会难得','直接拒绝，专注手上的项目','先估算中标概率 × 收益，再和常规项目的损失比较后决定'],best:2,
+  exp:'机会成本陷阱：把"看起来诱人"当成"值得做"。正确动作是先算期望值，而不是凭热情排序。'},
+ {d:'职业',q:'老板说"这个项目交给你，我很看好你"，但没有给出任何资源与成功标准。',
+  opts:['先答应下来，资源后面再争取','当场问清资源、成功标准与验收时间，再决定是否接','心里觉得不靠谱，但嘴上先答应'],best:1,
+  exp:'承诺升级陷阱：先答应再谈条件，等于让未来的自己替现在的面子买单。'},
+ {d:'职业',q:'你收到一份薪水高出 30% 的机会，但当前团队氛围和成长性都很好。',
+  opts:['立刻跳，钱最实在','留下来，别折腾','列出最看重的 3 个维度并分别打分，再决定'],best:2,
+  exp:'锚定陷阱：被 30% 这个数字吸走了全部注意力。多维度打分能把"感觉"变成可比较的结构。'},
+ {d:'职业',q:'项目已投入 6 个月，越来越多信号显示方向错了。',
+  opts:['继续投入，现在停下就全白费了','立刻砍掉，及时止损','先定中止线：未来两周出现什么信号就止损，到时按线执行'],best:2,
+  exp:'一边是沉没成本，一边是草率止损。真正的过程是<b>事前定中止线</b>，而不是临场让情绪决定。'},
+ {d:'投资',q:'某标的连涨三个月，身边的人都在买，媒体一片乐观。',
+  opts:['跟着买，趋势还在','绝对不碰，太贵了','先查同类标的在类似涨幅后的历史回落基准率，再决定仓位'],best:2,
+  exp:'社会认同 + 代表性启发。基准率（base rate）是外部视角的起点，先问"这类事情通常怎么收场"。'},
+ {d:'投资',q:'你持有的标的已经亏了 20%。',
+  opts:['加仓，摊平成本','立刻全部卖出','回到买入时写下的证伪条件，看它是否被触发，按条件执行'],best:2,
+  exp:'损失厌恶驱动的加仓是最危险的直觉。事前写下的证伪条件才是你真正的裁判——这也是为什么记录时必须先写它。'},
+ {d:'投资',q:'一位可靠的朋友给了你一条"内部消息"。',
+  opts:['重仓，朋友从不骗我','完全不信，肯定是坑','小仓位试探，并写下什么证据出现就说明消息不成立'],best:2,
+  exp:'可信度要加权，但权重不能替代验证。小仓位 + 证伪条件，就是在给这条信息定价。'},
+ {d:'投资',q:'理财顾问推荐一款"过去三年年化 15%"的产品。',
+  opts:['买，历史业绩说明一切','不买，过去不代表未来','问清最大回撤、费率和对标指数，再与基准比较'],best:2,
+  exp:'历史收益的代表性启发。回撤与基准比较才是风险的真实尺度——收益是故事，回撤是事实。'},
+ {d:'人际',q:'朋友开口借钱，金额不小，没提还款时间。',
+  opts:['借，关系比钱重要','直接拒绝','借出你"丢了也不心疼"的金额上限，并当场说清时间与边界'],best:2,
+  exp:'情感推理陷阱。先定上限再谈关系，能让两个目标都不崩——先设边界，再给善意。'},
+ {d:'人际',q:'同事在会上当众反驳你的方案。',
+  opts:['当场逐条反击','沉默，但记在心里','先问清他具体担心什么，会后再私下回应'],best:2,
+  exp:'即时反击服务的是自尊；服务目标的动作是先获取对方的信息。'},
+ {d:'人际',q:'亲密关系中发生争执，你确信自己是对的。',
+  opts:['坚持把道理讲清楚','算了，先妥协','先复述对方的观点直到对方认可"你懂了"，再谈解决'],best:2,
+  exp:'确信 ≠ 正确，而在人际冲突里，"被理解"通常是解决问题的前置条件。'},
+ {d:'消费',q:'购物车里的东西限时打折，还剩 2 小时。',
+  opts:['买，过了这村没这店','不买，都是套路','问自己：如果没有这个折扣，我还会买它吗'],best:2,
+  exp:'稀缺效应。去情境化提问（把折扣拿掉再问一次），能剥离 urgency 的影响。'}
+];
+var sjtSt=null;
+/* 每题随机打乱选项顺序——防止"正确答案总在第三项"被刷题者记住 */
+function sjtShuffle(n){ var a=[]; for(var i=0;i<n;i++)a.push(i);
+  for(var j=n-1;j>0;j--){ var k=Math.floor(Math.random()*(j+1)); var t=a[j]; a[j]=a[k]; a[k]=t; } return a; }
+function startSJT(){ sjtSt={i:0,logs:[],show:false,conf:70,pick:null,res:null,perm:sjtShuffle(SJT_DECK[0].opts.length)}; trainMode='sjt'; render(); }
+function sjtHtml(){
+  if(sjtSt.res) return sjtSummary();
+  var it=SJT_DECK[sjtSt.i];
+  var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+    +'<h2 style="margin:0">🚦 情境卡 '+(sjtSt.i+1)+'/'+SJT_DECK.length+'</h2>'
+    +'<button class="btn ghost sm" onclick="trainMode=null;render()">退出</button></div>'
+    +'<div class="opt-row" style="background:var(--amber-l);border-color:#efd9b0"><span class="tag amber">'+esc(it.d)+'</span>'
+    +'<p style="font-size:13.5px;margin-top:8px;white-space:pre-wrap">'+esc(it.q)+'</p></div>';
+  h+='<label>你会怎么做？（选项顺序已随机打乱）</label>';
+  h+=sjtSt.perm.map(function(oi,k){
+    return '<div class="list-item" style="cursor:pointer;'+(sjtSt.pick===k?'border-color:var(--blue);background:var(--blue-l)':'')+'"'
+      +' onclick="sjtSt.pick='+k+';render()"><span style="font-size:13px">'+esc(it.opts[oi])+'</span>'
+      +(sjtSt.pick===k?'<span class="tag blue">已选</span>':'')+'</div>';}).join('');
+  h+='<label>你对这个选择有多大把握？（%）</label><div class="slider-row">'
+    +'<input type="range" min="5" max="95" value="'+sjtSt.conf+'" oninput="sjtSt.conf=+this.value;document.getElementById(\'sj-v\').textContent=this.value+\'%\'">'
+    +'<span class="slider-val" id="sj-v">'+sjtSt.conf+'%</span></div>';
+  if(!sjtSt.show){
+    h+='<button class="btn" style="margin-top:12px" onclick="sjtSubmit()" '+(sjtSt.pick===null?'disabled':'')+'>提交看解析</button>';
+  } else {
+    h+='<div class="opt-row" style="margin-top:12px;background:var(--blue-l);border-color:#c9dff2">'
+      +'<b>'+(sjtSt.pick===it.best?'<span class="tag green">避开了陷阱</span>':'<span class="tag red">踩中了典型陷阱</span>')+'</b>'
+      +'<p class="tiny" style="margin-top:6px">💡 '+it.exp+'</p>'
+      +'<p class="tiny" style="margin-top:6px">你给的把握：'+sjtSt.conf+'%。'
+      +'（计分只反映"过程质量倾向"——先量化概率与基准率的人，选项通常更稳；凭感觉直接选也在这道题里留下了痕迹。）</p></div>'
+      +'<button class="btn ok" style="margin-top:12px" onclick="sjtNext()">'
+      +(sjtSt.i>=SJT_DECK.length-1?'看总结 →':'下一题 →')+'</button>';
+  }
+  return h+'</div>';
+}
+function sjtSubmit(){
+  var it=SJT_DECK[sjtSt.i];
+  var orig=sjtSt.perm[sjtSt.pick];   /* pick 是打乱后的位置，换回原始选项下标 */
+  sjtSt.logs.push({i:sjtSt.i,ok:orig===it.best,conf:sjtSt.conf,at:new Date().toISOString()});
+  sjtSt.show=true; render();
+}
+function sjtNext(){
+  if(sjtSt.i>=SJT_DECK.length-1){
+    var logs=sjtSt.logs;
+    S.sjt=logs; S.usage.sjt=(S.usage.sjt||0)+1;
+    var good=logs.filter(function(l){return l.ok}).length;
+    var avg=Math.round(logs.reduce(function(a,l){return a+l.conf},0)/logs.length);
+    save(); sjtSt={i:0,logs:[],show:false,conf:70,pick:null,
+      res:{n:logs.length,good:good,avg:avg}};
+    render(); return;
+  }
+  sjtSt.i++; sjtSt.show=false; sjtSt.pick=null; sjtSt.conf=70;
+  sjtSt.perm=sjtShuffle(SJT_DECK[sjtSt.i].opts.length); render();
+}
+function sjtSummary(){
+  var r=sjtSt.res;
+  var verdict = r.good>=10?'你的判断习惯相当稳健':r.good>=7?'基本合格，但仍有系统性偏好':r.good>=4?'存在明显的决策陷阱偏好':'决策高度依赖直觉，需要系统介入';
+  var h='<div class="card" style="text-align:center;padding:26px 20px">'
+    +'<h2 style="margin:0">🚦 情境卡总结</h2>'
+    +'<div class="grid g3" style="margin:14px 0">'
+    +stat(r.good+'/'+r.n,'避开陷阱') + stat(r.avg+'%','平均把握') + stat(verdict,'总评') +'</div>'
+    +'<p class="muted">这 12 题来自职业发展、投资、人际、消费四类高频情境，每题的陷阱都对应一个具体的认知偏差。</p>'
+    +'<p class="tiny" style="margin-top:8px">⚠️ 情境卡的解析是<b>教学反馈</b>，不是你的真实战绩，不计入校准曲线。</p>'
+    +'<div style="display:flex;gap:8px;justify-content:center;margin-top:14px">'
+    +'<button class="btn" onclick="startSJT()">再做一次</button>'
+    +'<button class="btn ghost" onclick="trainMode=\'fcst\';render()">去做预测训练 →</button></div></div>';
+  return h;
+}
+
+/* ================= 决策质量六要素自检（SDG · 链式规则） ================= */
+/* 依据：Spetzler / Winter / Meyer《决策质量》（2016），源自 Ronald Howard 决策分析学派。
+   链式规则：整体决策质量 = 最弱环节，不是平均值。 */
+var DQ_KEYS=[
+  {k:'frame', n:'问题框定', q:'我问的问题，是真正需要回答的那个吗？（还是被别人/情绪替我框定了？）'},
+  {k:'alts',  n:'备选方案', q:'我有真正不同的选项吗？还是只在"做/不做"之间打转？'},
+  {k:'info',  n:'信息质量', q:'我依据的信息可靠吗？还是道听途说、单一来源、或者我自己想听的？'},
+  {k:'values',n:'价值权衡', q:'我清楚自己要什么、愿意拿什么换吗？'},
+  {k:'logic', n:'推理逻辑', q:'我的推导成立吗？概率、因果、基准率有没有被我忽略？'},
+  {k:'commit',n:'执行承诺', q:'如果结论我不喜欢，我还会执行吗？落地有具体人和时间吗？'}
+];
+var dqTmp=null;
+function dqScore(d){ if(!d.dq) return null;
+  return Math.min.apply(null,DQ_KEYS.map(function(x){return d.dq[x.k]})); }
+function dqWeakest(d){ if(!d.dq) return null;
+  var worst=DQ_KEYS[0];
+  DQ_KEYS.forEach(function(x){ if(d.dq[x.k]<d.dq[worst.k]) worst=x; });
+  return worst; }
+function dqAvg(){ var a=S.decisions.filter(function(d){return d.dq}).map(dqScore);
+  return a.length? a.reduce(function(s,v){return s+v},0)/a.length : null; }
+function openDQ(id){
+  var d=S.decisions.find(function(x){return x.id===id}); if(!d) return;
+  dqTmp={id:id, v:{}};
+  DQ_KEYS.forEach(function(x){ dqTmp.v[x.k]= d.dq? d.dq[x.k] : 60; });
+  var h='<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    +'<button class="close" onclick="closeModal()">✕</button><h2>📐 决策质量自检 · 30 秒</h2>'
+    +'<div class="why">💡 依据 SDG 决策质量六要素（Spetzler / Winter / Meyer, 2016）。'
+    +'<b>链式规则：整体质量 = 最弱的一环，不是平均分</b>——所以别只顾着给擅长的那项打高分。</div>'
+    +'<p class="tiny" style="color:var(--t3);margin-bottom:10px">针对：'+esc(trunc(d.situation,40))+'</p>';
+  DQ_KEYS.forEach(function(x){
+    h+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:baseline">'
+      +'<b style="font-size:13px">'+x.n+'</b>'
+      +'<span class="slider-val" id="dq-'+x.k+'">'+dqTmp.v[x.k]+'</span></div>'
+      +'<div class="tiny" style="color:var(--t3);margin:2px 0 4px">'+x.q+'</div>'
+      +'<input type="range" min="0" max="100" value="'+dqTmp.v[x.k]+'" style="width:100%" '
+      +'oninput="dqTmp.v.'+x.k+'=+this.value;document.getElementById(\'dq-'+x.k+'\').textContent=this.value;dqLive()"></div>';
+  });
+  h+='<div id="dq-live" class="why" style="background:var(--purple-l);border-color:#ddd0f0">拉一下滑块，这里会实时告诉你最弱环节。</div>'
+    +'<div style="margin-top:14px;display:flex;gap:8px">'
+    +'<button class="btn ok" onclick="saveDQ()">保存自检</button>'
+    +'<button class="btn ghost" onclick="closeModal()">取消</button></div></div></div>';
+  document.getElementById('modal-root').innerHTML=h; dqLive();
+}
+function dqLive(){
+  var vals=DQ_KEYS.map(function(x){return dqTmp.v[x.k]});
+  var mn=Math.min.apply(null,vals);
+  var worst=DQ_KEYS[vals.indexOf(mn)];
+  var el=document.getElementById('dq-live');
+  if(!el) return;
+  var lv = mn>=80?'🟢 质量扎实，可以执行' : mn>=60?'🟡 可用，但先补最弱环节' : '🔴 别急着决定——最弱环节会拖垮全局';
+  el.innerHTML='<b>DQ 分 '+mn+' / 100</b>（链式规则 = 最弱环节：'+worst.n+'）　'+lv
+    +'<br><span style="color:var(--t3)">平均分 '+(Math.round(vals.reduce(function(a,b){return a+b},0)/6))+' —— 但平均分没有意义，别看它。</span>';
+}
+function saveDQ(){
+  var d=S.decisions.find(function(x){return x.id===dqTmp.id});
+  d.dq={}; DQ_KEYS.forEach(function(x){ d.dq[x.k]=dqTmp.v[x.k]; });
+  d.dq.at=new Date().toISOString(); save();
+  closeModal(); render();
+  toast('📐 DQ '+dqScore(d)+' 分 · 最弱环节 '+dqWeakest(d).n);
+}
+function openDQPicker(){
+  var pool=S.decisions.filter(function(d){return !d.dq});
+  if(!pool.length){ toast('所有记录都做过质量自检了。'); return; }
+  var h='<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    +'<button class="close" onclick="closeModal()">✕</button><h2>📐 选一条记录做质量自检</h2>'
+    +'<p class="tiny" style="color:var(--t3);margin-bottom:10px">共 '+pool.length+' 条未自检。建议优先给<b>还没落地的重要决策</b>做——自检的意义在事前，不在事后。</p>';
+  pool.slice(0,20).forEach(function(d){
+    h+='<div class="list-item" style="padding:10px 12px" onclick="closeModal();openDQ(\''+d.id+'\')">'
+      +'<span style="flex:1">'+esc(trunc(d.situation,44))+'</span>'
+      +'<span class="tiny">'+esc(d.domain||'—')+'</span></div>';
+  });
+  document.getElementById('modal-root').innerHTML=h+'</div></div>';
+}
+
+/* ================= 多方会诊（Advisory Board） ================= */
+/* 设计原则：
+   1) 视角只提问，不替你做决定——保持与 AI 教练一致的纪律
+   2) 借的是"思维方式"，不是"人格扮演"：芒格的反向思考、塔勒布的尾部风险本质都是提问
+   3) 必须记录"你采纳了哪条"，否则无法量化"哪个视角对你真的有用"
+   4) 唯一有你自己真值的视角是「我的原则库」——其余都是外部启发，没有你的数据支撑 */
+var BOARD=[
+ {id:'munger',ico:'🔁',name:'芒格 · 反向思考',basis:'Charlie Munger「Invert, always invert」+ 多元思维模型：与其想怎么成功，先想怎么必然失败。',
+  qs:['如果这个决定彻底失败，最先崩的是哪一步？',
+      '我要怎么做，才能确保这个决定一定失败？然后反过来避免它。',
+      '我依据的是哪个学科的模型？换一个模型（心理学/经济学/物理/进化）看，结论会变吗？',
+      '我是不是在用"我记得的少数案例"代替了"基准率"？']},
+ {id:'taleb',ico:'🦢',name:'塔勒布 · 尾部风险',basis:'黑天鹅 / 反脆弱：区分"平均斯坦"与"极端斯坦"，别把没发生过当成不会发生。',
+  qs:['最坏情况发生时，我会被击穿吗？下行有没有底？',
+      '我承担的是"有限上行 + 无限下行"，还是反过来？',
+      '我有没有把"过去几年没出事"当成"以后不会出事"的证据？',
+      '这次暴露的额度，是我输得起的吗？']},
+ {id:'naval',ico:'⚖️',name:'纳瓦尔 · 判断力与可逆性',basis:'《纳瓦尔宝典》：判断力 > 努力；可逆的小决定快速做，不可逆的才值得慢想。',
+  qs:['这个决定可逆吗？如果可逆，我是不是在过度纠结？',
+      '五年后回看，这个决定的重要性排第几？',
+      '我在用杠杆（资本 / 劳动力 / 媒体 / 代码）吗？还是单纯在拿时间换？',
+      '如果这件事只能靠"更努力"解决，是不是说明方向没选对？']},
+ {id:'devil',ico:'😈',name:'反方 · 最强反对意见',basis:'Steelman：不采纳的反对意见，就不算真的想清楚了。',
+  qs:['如果我必须选另一个选项，最强的理由是什么？',
+      '如果我一位可信的朋友持完全相反意见，他会说什么？',
+      '我有没有把"我希望如此"当成了"我认为大概率如此"？',
+      '有哪些信息我还没拿到，但拿到后可能会改变结论？']},
+ {id:'principles',ico:'📜',name:'我的原则库',basis:'自动匹配本决策所属领域的 if-then 原则。这是唯一有你自己真值的视角——上面四个都是外部启发，没有你的数据支撑。',dyn:true}
+];
+var bSel=null, bRun=null, bLoading=false;
+function openBoard(id){
+  var d=S.decisions.find(function(x){return x.id===id}); if(!d) return;
+  bSel={id:id,sel:['munger','principles']}; bRun=null; bLoading=false;
+  showBoardModal();
+}
+function showBoardModal(){ document.getElementById('modal-root').innerHTML=boardHtml(); }
+function boardHtml(){
+  if(bRun) return boardRunHtml();
+  if(bLoading){
+    return '<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal" style="text-align:center;padding:30px">'
+      +'<div style="font-size:30px">🩺</div><h2 style="margin:10px 0 6px">AI 正在生成针对性追问…</h2>'
+      +'<p class="muted">每个视角会拿到这条决策的完整记录（选项/预期/直觉/可证伪承诺），'
+      +'生成只属于它的追问——不是通用清单。</p></div></div>';
+  }
+  var d=S.decisions.find(function(x){return x.id===bSel.id});
+  var aiOn=!!(S.settings.aiEndpoint&&S.settings.aiKey&&S.settings.aiModel);
+  var h='<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    +'<button class="close" onclick="closeModal()">✕</button><h2>🩺 多方会诊</h2>'
+    +'<div class="why">💡 借的是<b>思维方式</b>，不是人格扮演。每个视角只提问、不替你做决定——'
+    +'芒格的"反过来想"、塔勒布的"尾部风险"本质上都是提问。<b>唯一有你自己真值的是「我的原则库」。</b>'
+    +(aiOn?'<br>已连接 AI：非原则视角的追问将<b>针对这条决策现场生成</b>。':'<br>未配置 AI：使用固定问题库（设置页可接入任意 OpenAI 兼容端点）。')+'</div>'
+    +'<p class="tiny" style="color:var(--t3);margin-bottom:10px">针对：'+esc(trunc(d.situation,40))+'</p>'
+    +'<label>选 1~3 个视角（多了会变成走过场）</label><div class="checks">';
+  BOARD.forEach(function(v){
+    var on=bSel.sel.indexOf(v.id)>=0;
+    h+='<label class="'+(on?'on':'')+'" onclick="toggleBoardView(\''+v.id+'\')">'+(on?'✓ ':'')+v.ico+' '+v.name+'</label>';
+  });
+  h+='</div><div style="margin-top:12px;display:flex;gap:8px">'
+    +'<button class="btn ok" onclick="runBoard()">'+(aiOn?'开始会诊（AI 生成）':'开始会诊')+'</button>'
+    +'<button class="btn ghost" onclick="closeModal()">取消</button></div></div></div>';
+  return h;
+}
+function toggleBoardView(vid){
+  var i=bSel.sel.indexOf(vid);
+  if(i>=0){ if(bSel.sel.length>1) bSel.sel.splice(i,1); else { toast('至少选一个视角。'); return; } }
+  else { if(bSel.sel.length>=3){ toast('最多 3 个——视角太多会变成走过场。'); return; } bSel.sel.push(vid); }
+  showBoardModal();
+}
+function boardQuestions(d,vid){
+  var v=BOARD.find(function(x){return x.id===vid}); if(!v) return [];
+  if(v.dyn){
+    return candPrinciples(d).map(function(p){
+      var st=pStats(p);
+      var extra = st.total?('（已检验 '+st.total+' 次，违背 '+Math.round(st.rate*100)+'%）'):'（尚未被检验过）';
+      return '你有一条原则：IF '+p.ifText+' THEN '+p.thenText+'。'+extra+'这次做到了吗？如果没做到，是什么挡住了？';
+    });
+  }
+  return v.qs.slice();
+}
+function runBoard(){
+  var d=S.decisions.find(function(x){return x.id===bSel.id});
+  var aiOn=!!(S.settings.aiEndpoint&&S.settings.aiKey&&S.settings.aiModel);
+  var dynVids=bSel.sel.filter(function(vid){ var v=BOARD.find(function(x){return x.id===vid}); return v&&v.dyn; });
+  var aiVids=bSel.sel.filter(function(vid){ var v=BOARD.find(function(x){return x.id===vid}); return v&&!v.dyn; });
+  function buildStatic(){
+    var items=[];
+    bSel.sel.forEach(function(vid){ boardQuestions(d,vid).forEach(function(q){ items.push({v:vid,q:q,mark:null}); }); });
+    return items;
+  }
+  if(!aiOn || !aiVids.length){
+    var items=buildStatic();
+    if(!items.length){ toast('「我的原则库」视角需要至少有 1 条原则。换一个视角。'); return; }
+    bRun={id:bSel.id,items:items}; showBoardModal(); return;
+  }
+  /* AI 路径：非原则视角的追问针对这条决策现场生成 */
+  bLoading=true; showBoardModal();
+  var summary='【领域】'+(d.domain||'—')+'\n【情境】'+d.situation+(d.detail?'\n【细节】'+d.detail:'')
+    +'\n【备选】'+((d.options&&d.options.length)?d.options.map(function(o,i){
+        return (i+1)+'. '+o.name+'（预期：'+(o.expected||'—')+(o.prob!=null&&o.prob!==''?'，主观概率 '+o.prob+'%':'')+'）';
+      }).join('；'):'未记录')
+    +'\n【我的倾向】'+(d.chosen!=null&&d.options&&d.options.length?(((d.options[+d.chosen]||{name:d.chosen}).name)||'未定'):'未定')
+    +'\n【10秒直觉】'+(d.intuition||'—')+'\n【慢分析】'+(d.analysis||'—')
+    +'\n【可证伪承诺】'+(d.falsifier||'—')
+    +'\n【当时的情绪】'+((d.emotions||[]).map(function(e){return e.name+'('+e.intensity+')'}).join('、')||'未记录');
+  var sys='你是"决策蒸馏"App的多方会诊主持人。用户给你一条决策记录和若干思维视角。你的任务：站在每个视角的思维模型上，针对这条具体决策，生成 3~4 条一针见血的追问。\n'
+    +'纪律：只提问，不给建议，不替用户做决定；每个问题必须引用记录中的具体内容（某个选项、某条预期、某个假设、某种情绪），泛泛而谈视为失败。\n'
+    +'输出格式：一个 json 代码块（三个反引号标注 json）：{"items":[{"v":"视角id","q":"追问"}]}，视角id 只能从用户指定的列表中选。';
+  var usr='指定视角：\n'+aiVids.map(function(vid){
+      var v=BOARD.find(function(x){return x.id===vid}); return '- '+v.id+'（'+v.name+'）：'+v.basis;
+    }).join('\n')+'\n\n决策记录：\n'+summary;
+  aiPost([{role:'system',content:sys},{role:'user',content:usr}],
+    function(j){
+      bLoading=false;
+      var items=[];
+      (j.items||[]).forEach(function(x){
+        if(x&&x.q&&aiVids.indexOf(x.v)>=0) items.push({v:x.v,q:String(x.q),mark:null});
+      });
+      dynVids.forEach(function(vid){ boardQuestions(d,vid).forEach(function(q){ items.push({v:vid,q:q,mark:null}); }); });
+      if(!items.length){
+        var fb=buildStatic();
+        if(!fb.length){ showBoardModal(); toast('「我的原则库」视角需要至少有 1 条原则。'); return; }
+        bRun={id:bSel.id,items:fb}; showBoardModal();
+        toast('AI 生成的问题不可用，已退回固定问题库。',3600); return;
+      }
+      bRun={id:bSel.id,items:items}; showBoardModal();
+    },
+    function(){
+      bLoading=false;
+      var items=buildStatic();
+      if(!items.length){ showBoardModal(); toast('AI 调用失败，且「我的原则库」视角需要至少 1 条原则。'); return; }
+      bRun={id:bSel.id,items:items}; showBoardModal();
+      toast('AI 调用失败，已退回固定问题库。',3600);
+    });
+}
+function boardRunHtml(){
+  var d=S.decisions.find(function(x){return x.id===bRun.id});
+  var h='<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    +'<button class="close" onclick="closeModal()">✕</button><h2>🩺 会诊中 · '+bRun.items.length+' 个追问</h2>'
+    +'<div class="why">💡 每条追问标一个结论。<b>「已采纳」意味着它真的改变了你的判断</b>——'
+    +'攒够数据后，系统会告诉你哪个视角对你真的有用、哪个只是听起来有道理。</div>';
+  bRun.items.forEach(function(it,i){
+    var v=BOARD.find(function(x){return x.id===it.v});
+    h+='<div class="pf-row" style="flex-direction:column;align-items:stretch;gap:6px;padding:10px 0">'
+      +'<div><span class="tiny" style="color:var(--t3)">'+v.ico+' '+v.name+'</span>'
+      +'<div style="font-size:13px;margin-top:3px">'+esc(it.q)+'</div></div>'
+      +'<div style="display:flex;gap:6px">'
+      +['adopted','useful','meh'].map(function(m){
+          var lb={adopted:'已采纳',useful:'有用',meh:'没用'}[m];
+          return '<button class="pf-btn '+(it.mark===m?(m==='adopted'?'ok':m==='useful'?'ok':'no'):'')+'" onclick="markBoard('+i+',\''+m+'\')">'
+            +(it.mark===m?'• ':'')+lb+'</button>';}).join('')
+      +'</div></div>';
+  });
+  h+='<div style="margin-top:14px;display:flex;gap:8px">'
+    +'<button class="btn ok" onclick="saveBoard()">保存会诊记录</button>'
+    +'<button class="btn ghost" onclick="bRun=null;showBoardModal()">重选视角</button></div></div></div>';
+  return h;
+}
+function markBoard(i,m){ bRun.items[i].mark = (bRun.items[i].mark===m? null : m); showBoardModal(); }
+function saveBoard(){
+  var d=S.decisions.find(function(x){return x.id===bRun.id});
+  var marked=bRun.items.filter(function(it){return it.mark});
+  if(!marked.length){ toast('至少标一条，否则这次会诊没有可统计的数据。'); return; }
+  d.boards=d.boards||[];
+  d.boards.push({at:new Date().toISOString(),views:bSel.sel.slice(),items:marked.map(function(it){return {v:it.v,q:it.q,mark:it.mark}})});
+  save(); closeModal(); render();
+  toast('🩺 已记录 '+marked.length+' 条（采纳 '+marked.filter(function(x){return x.mark==='adopted'}).length+' 条）');
+}
+function boardStats(){
+  var m={};
+  S.decisions.forEach(function(d){ (d.boards||[]).forEach(function(b){
+    (b.items||[]).forEach(function(it){
+      if(!m[it.v]) m[it.v]={n:0,adopted:0,useful:0};
+      m[it.v].n++;
+      if(it.mark==='adopted') m[it.v].adopted++;
+      if(it.mark==='useful') m[it.v].useful++;
+    });});});
+  return m;
+}
+function boardTotals(){
+  var m=boardStats(), t={n:0,adopted:0};
+  Object.keys(m).forEach(function(k){ t.n+=m[k].n; t.adopted+=m[k].adopted; });
+  return t.n? {n:t.n, rate:Math.round(100*t.adopted/t.n)} : null;
+}
+
+/* ================= 导出我的决策 Skill（SKILL.md） ================= */
+/* 借人格技能库的通用格式，但内容来自有真值的行为数据，不是语料。
+   隐私红线：默认脱敏，不导出任何具体情境原文。 */
+function topBiases(){
+  var m={}; allReviews().forEach(function(r){ (r.biases||[]).forEach(function(b){ m[b]=(m[b]||0)+1; }); });
+  return Object.keys(m).map(function(k){return {name:k,n:m[k]}}).sort(function(a,b){return b.n-a.n});
+}
+function exportSkill(sanitize){
+  var n=S.decisions.length, rv=reviewedCount();
+  if(!n){ toast('还没有任何记录，导出的 Skill 会是空的。'); return; }
+  var fc=fcStats(), dqA=dqAvg(), pf=pfScore(), bt=boardTotals();
+  var ps=S.principles.map(function(p){ var st=pStats(p); return {p:p,st:st}; })
+    .sort(function(a,b){ if(a.st.total!==b.st.total) return b.st.total-a.st.total; return a.st.rate-b.st.rate; });
+  var solid=ps.filter(function(x){return x.st.total<5||x.st.rate<0.5});
+  var wish =ps.filter(function(x){return x.st.total>=5&&x.st.rate>=0.5});
+  var bias=topBiases().slice(0,3);
+  var ds=domainStats();
+
+  var L=[];
+  L.push('---');
+  L.push('name: my-decision-self');
+  L.push('description: 基于 '+n+' 条真实决策记录蒸馏的「我」的决策分身。用于在任何支持 Skill 的 Agent 中，以我的原则与校准画像辅助判断。不是我的完整人格，只是我的决策数据的投影。');
+  L.push('---');
+  L.push('');
+  L.push('# 我的决策分身 · MY DECISION SELF');
+  L.push('');
+  L.push('> 生成自「决策蒸馏 Decision Distiller」。这份文件的数据源是**带真值的行为记录**（事前承诺 → 现实结果 → 复盘评分），');
+  L.push('> 不是从我的文字语料里提炼的。区别在于：语料里那个"我"是我希望被看到的我，这里的"我"是被现实修正过的我。');
+  L.push('');
+  L.push('## 0. 这份文件不是什么（重要）');
+  L.push('');
+  L.push('- 它不是我的人格，是我的**决策数据的投影**');
+  L.push('- 它没有我的情绪、没有当下的情境信息、不知道我现在手里有什么牌');
+  L.push('- 它只能做三件事：报出我的原则、提醒我的校准画像、指出我常犯的偏差');
+  L.push('- **它永远不能替我做决定**——只能提问');
+  L.push('');
+  L.push('## 1. 数据可信度（先看这个，再往下看）');
+  L.push('');
+  L.push('| 指标 | 值 | 样本量 |');
+  L.push('|---|---|---|');
+  L.push('| 决策记录 | '+n+' 条 | — |');
+  L.push('| 已复盘 | '+rv+' 条 | — |');
+  L.push('| 判断准确度（Brier） | '+(fc?fc.brier.toFixed(3):'—')+' | '+(fc?fc.n:0)+' 条已揭晓预测 |');
+  L.push('| 过程质量（DQ，取最弱环节） | '+(dqA!=null?Math.round(dqA):'—')+' | '+S.decisions.filter(function(d){return d.dq}).length+' 条已自检 |');
+  L.push('| 原则执行力（1 − 违背率） | '+(pf?pf.score+'%':'—')+' | '+(pf?pf.n:0)+' 次原则检验 |');
+  L.push('| 外部视角采纳率 | '+(bt?bt.rate+'%':'—')+' | '+(bt?bt.n:0)+' 条会诊追问 |');
+  L.push('');
+  L.push('⚠️ **样本量小于 30 时，下面所有结论都只是方向性自我觉察，不是统计结论。**');
+  L.push('');
+  L.push('## 2. 我的原则（按检验次数排序）');
+  L.push('');
+  if(!ps.length){ L.push('_还没有原则。这个系统要求先诚实记录，同类情境出现 3 次以上才提炼原则——太早蒸馏出来的只是噪音。_'); }
+  else {
+    if(solid.length){
+      L.push('### 有执行记录支撑的');
+      L.push('');
+      solid.forEach(function(x){
+        var rate = x.st.total? '检验 '+x.st.total+' 次 · 违背 '+Math.round(x.st.rate*100)+'%' : '尚未被检验';
+        L.push('- **IF** '+x.p.ifText);
+        L.push('  **THEN** '+x.p.thenText);
+        L.push('  — '+x.p.domain+' · '+rate+((x.p.rationale&&!sanitize)?' · 依据：'+x.p.rationale:''));
+      });
+      L.push('');
+    }
+    if(wish.length){
+      L.push('### 违背率过半：这些是愿望，不是原则');
+      L.push('');
+      L.push('_以下原则被检验 5 次以上且违背率 ≥50%。它们记录的是"我想成为的人"，不是"现在的我"。要么改写成做得到的，要么承认它不是原则。_');
+      L.push('');
+      wish.forEach(function(x){
+        L.push('- **IF** '+x.p.ifText);
+        L.push('  **THEN** '+x.p.thenText);
+        L.push('  — 检验 '+x.st.total+' 次 · **违背 '+Math.round(x.st.rate*100)+'%**');
+      });
+      L.push('');
+    }
+  }
+  L.push('## 3. 我在哪些领域可信（校准画像）');
+  L.push('');
+  if(!Object.keys(ds).length){ L.push('_还没有领域数据。_'); }
+  else {
+    L.push('| 领域 | 记录数 | 平均过程分 | 结论 |');
+    L.push('|---|---|---|---|');
+    Object.keys(ds).forEach(function(k){
+      var x=ds[k], avg=x.pN?(x.pSum/x.pN).toFixed(1):null;
+      var c = avg==null?'待复盘出分' : (avg>=7?'直觉在此领域较可信' : avg>=5?'需慢想 + 找反对意见' : '**直觉在此领域不可信，必须慢想**');
+      L.push('| '+k+' | '+x.n+' | '+(avg||'—')+' | '+c+' |');
+    });
+    L.push('');
+    L.push('_过程分 <5 的领域，就是我该主动找反对意见的领域。这不是能力评价，是校准。_');
+  }
+  L.push('');
+  L.push('## 4. 我常犯的认知偏差');
+  L.push('');
+  if(!bias.length){ L.push('_还没有复盘记录偏差数据。_'); }
+  else { bias.forEach(function(b){ L.push('- '+b.name+'（自认出现 '+b.n+' 次）'); }); L.push(''); }
+  L.push('## 5. 与我协作的纪律');
+  L.push('');
+  L.push('1. **只提问，不给建议，不替我做决定。** 我的判断归我，后果也归我。');
+  L.push('2. 当我要做一个判断时，先报出**匹配的原则**（第 2 节）和**该领域的校准结论**（第 3 节），然后提问。');
+  L.push('3. 如果我给的置信度 <70%，提醒我把它当假设，不要当事实。');
+  L.push('4. 如果我正处在高情绪状态，提醒我：**高情绪下不做不可逆决定**。');
+  L.push('5. 如果我的推理里出现了第 4 节列出的偏差，直接指出来。');
+  L.push('6. 如果现实的反馈和这份文件冲突，**以现实为准，并提醒我回来更新这份文件**。');
+  L.push('');
+  L.push('---');
+  L.push('');
+  L.push('_生成时间：'+fmtFull(new Date().toISOString())+' · 数据源：'+n+' 条决策 / '+rv+' 条复盘 / '+S.principles.length+' 条原则_');
+  if(sanitize){
+    L.push('_本文件为脱敏版：已剔除原则"依据"原文（那里可能含情境细节），仅保留 IF/THEN、统计与画像。');
+    L.push('IF/THEN 仍是你本人撰写的文字，上传云端 Agent 前请最后过目一遍。_');
+  } else {
+    L.push('_⚠️ 完整版：包含原则"依据"原文（复盘教训，可能含具体情境）。仅限本机留存，勿上传云端 Agent 或公开。_');
+  }
+
+  var md=L.join('\n');
+  var blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='my-decision-skill-'+fmtFull(new Date().toISOString())+(sanitize?'':'（未脱敏）')+'.md';
+  a.click();
+  toast('📤 决策 Skill 已导出'+(sanitize?'（已脱敏）':'（未脱敏，勿上传）'));
+}
+
+/* ================= 设置 ================= */
+function viewSettings(){
+  var s=S.settings;
+  var h='<div class="card"><h2>🤖 AI 配置（可插拔）</h2>'
+    +'<p class="muted" style="margin-bottom:10px">支持任意 OpenAI 兼容端点：云 API（OpenAI / DeepSeek / 通义等）或本地模型（Ollama：'
+    +'http://localhost:11434/v1/chat/completions，密钥随便填）。<b>未配置时所有功能均可降级使用。</b></p>'
+    +'<label>API 端点（完整 URL）</label><input type="text" id="set-ep" value="'+esc(s.aiEndpoint)+'" placeholder="https://api.openai.com/v1/chat/completions">'
+    +'<label>API Key（仅存本机 localStorage）</label><input type="password" id="set-key" value="'+esc(s.aiKey)+'" placeholder="sk-...（本地模型可填 ollama）">'
+    +'<label>模型名</label><input type="text" id="set-model" value="'+esc(s.aiModel)+'" placeholder="gpt-4o-mini / deepseek-chat / qwen2.5:7b ...">'
+    +'<div style="margin-top:12px;display:flex;gap:8px"><button class="btn" onclick="saveAI()">保存</button>'
+    +'<button class="btn ghost" id="ai-test" onclick="testAI()">测试连接</button></div>'
+    +'<p class="tiny" style="margin-top:8px">⚠️ 隐私提示：使用云端 API 时，你的决策对话会经过该服务商。决策记录属高度敏感数据——'
+    +'介意请在本地跑模型，或只用引导向导模式。</p></div>';
+  h+='<div class="card"><h2>📈 我的使用数据（第一手用户研究）</h2><div class="kv">'
+    +'<span class="k">快捕</span><span>'+S.usage.quick+' 次，补全 '+S.usage.quickDone+' 次（'+(S.usage.quick?Math.round(100*S.usage.quickDone/S.usage.quick):0)+'%）</span>'
+    +'<span class="k">引导/AI</span><span>'+S.usage.guided+' / '+S.usage.ai+' 次</span>'
+    +'<span class="k">复盘</span><span>'+S.usage.reviews+' 次，完成率 '+reviewRate()+'%</span>'
+    +'<span class="k">训练</span><span>回放 '+S.usage.replays+' 次 · 闪卡 ✓'+S.usage.fcEasy+' ✗'+S.usage.fcHard+'</span>'
+    +'<span class="k">快轨</span><span>测评 '+(S.usage.assess||0)+' 次 · 预测 '+(S.usage.forecasts||0)+' 条 · 情境卡 '+(S.usage.sjt||0)+' 次</span>'
+    +'<span class="k">考古/种子</span><span>回溯建档 '+(S.usage.arc||0)+' 条 · 安装种子原则 '+(S.usage.seed||0)+' 条</span>'
+    +'<span class="k">质量自检</span><span>'+S.decisions.filter(function(d){return d.dq}).length+' / '+S.decisions.length+' 条已做</span>'
+    +'<span class="k">三条线</span><span>Brier '+(fcStats()?fcStats().brier.toFixed(3):'—')+' · DQ '+(dqAvg()!=null?Math.round(dqAvg()):'—')+' · 原则执行 '+(pfScore()?pfScore().score+'%':'—')+'</span>'
+    +'</div><p class="tiny" style="margin-top:8px">这些数据回答作品集里最难的问题："你怎么知道需求是真的？"——'
+    +'快轨/慢轨的分布会告诉你，你到底是卡在记录上，还是卡在复盘上。</p></div>';
+  h+='<div class="card"><h2>⌨️ 快捷键</h2><div class="kv">'
+    +'<span class="k"><span class="kbd">N</span></span><span>新建快速记录（任何页面）</span>'
+    +'<span class="k"><span class="kbd">/</span></span><span>跳到决策库并聚焦搜索</span>'
+    +'<span class="k"><span class="kbd">Esc</span></span><span>关闭弹窗 / 退出输入框</span></div></div>';
+  h+='<div class="card"><h2>💾 数据与导出</h2>'
+    +'<p class="tiny" style="margin-bottom:10px">数据 100% 存在本机，不上传任何服务器。'
+    +(S.lastExport?'上次手动备份：'+fmtFull(S.lastExport)+'（'+daysSince(S.lastExport)+' 天前）':'尚未手动导出过备份。')
+    +'备份文件<b>不含 API Key</b>。换浏览器/设备用导出导入迁移。</p>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button class="btn ghost" onclick="exportData()">导出 JSON 备份</button>'
+    +'<button class="btn ghost" onclick="icsAll()">📅 导出复盘日历 (.ics)</button>'
+    +'<label class="btn ghost" style="cursor:pointer;margin:0">导入 JSON<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>'
+    +'<button class="btn warn" onclick="resetAll()">清空全部数据</button></div>'
+    +'<p class="tiny" style="margin-top:8px">复盘日历导入手机/电脑日历后，<b>App 不开着也会到点提醒</b>——'
+    +'这是"复盘提醒自动化"的可靠路径（PWA 自身做不了系统推送）。重复导入会产生重复日历事件。</p></div>';
+  h+='<div class="card"><h2>🧬 导出我的决策 Skill（SKILL.md）</h2>'
+    +'<p class="tiny" style="margin-bottom:10px">把原则库 + 校准画像 + 高频偏差打包成 Agent Skill，装进任何支持 Skill 的 AI 助手'
+    +'——"高层的你"跟着你走。两个版本内容一致，区别在是否包含原则"依据"原文。</p>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button class="btn ghost" onclick="exportSkill(true)">脱敏版（可上传云端 Agent）</button>'
+    +'<button class="btn ghost" onclick="exportSkill(false)">完整版（仅本机留存）</button></div></div>';
+  h+='<div class="card"><h2>🛡️ 数据保险（v4.0 新增）</h2><div class="kv">'
+    +'<span class="k">备用存储</span><span>IndexedDB 实时镜像——主存储被浏览器清空时自动找回</span>'
+    +'<span class="k">自动备份文件</span><span>'+(S.lastBackup?('✅ '+esc(S.bkName||'备份文件')+' · 上次写入 '+fmtFull(S.lastBackup)):'未设置（仅 Chrome/Edge 桌面版支持）')+'</span>'
+    +'</div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button class="btn ghost sm" onclick="setupAutoBackup()">📁 选择自动备份文件</button>'
+    +'<button class="btn ghost sm" onclick="autoBackupNow()">立即写一次</button></div>'
+    +'<p class="tiny" style="margin-top:8px">⚠️ 浏览器会清除长期未访问站点的存储（iOS Safari 对未安装到主屏的站点是 7 天）。'
+    +'三道保险：①装到主屏（PWA 不受 7 天限制）②IndexedDB 镜像 ③自动备份文件（设置后每 10 分钟静默落盘）。</p></div>';
+  return h;
+}
+function saveAI(){
+  S.settings.aiEndpoint=document.getElementById('set-ep').value.trim();
+  S.settings.aiKey=document.getElementById('set-key').value.trim();
+  S.settings.aiModel=document.getElementById('set-model').value.trim();
+  save(); toast('✅ AI 配置已保存'); render();
+}
+function testAI(){
+  var btn=document.getElementById('ai-test'); btn.disabled=true; btn.textContent='测试中…';
+  fetch(S.settings.aiEndpoint,{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+S.settings.aiKey},
+    body:JSON.stringify({model:S.settings.aiModel,max_tokens:10,messages:[{role:'user',content:'ping'}]})})
+  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(function(){ btn.textContent='✅ 连接成功'; btn.disabled=false; })
+  .catch(function(e){ btn.textContent='❌ '+e.message; btn.disabled=false; });
+}
+function exportData(){
+  S.lastExport=new Date().toISOString(); save();
+  var blob=new Blob([JSON.stringify(stripKey(S),null,2)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='decision-distiller-'+fmtFull(new Date().toISOString())+'.json'; a.click();
+  toast('📦 备份已导出（不含 API Key）');
+}
+/* ---------- 复盘日历（.ics）：导入系统日历后，App 不开着也会到点提醒 ---------- */
+function escIcs(s){
+  return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/;/g,'\\;')
+    .replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+}
+function icsDate(ts){ var d=new Date(ts); return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()); }
+function pad2(n){ return (n<10?'0':'')+n; }
+function buildIcs(events,fname){
+  var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Decision Distiller//CN','CALSCALE:GREGORIAN'];
+  events.forEach(function(ev){
+    L.push('BEGIN:VEVENT');
+    L.push('UID:'+ev.uid);
+    L.push('DTSTAMP:'+icsDate(Date.now())+'T000000Z');
+    L.push('DTSTART;VALUE=DATE:'+icsDate(ev.start));
+    L.push('DTEND;VALUE=DATE:'+icsDate(ev.start+86400000));
+    L.push('SUMMARY:'+escIcs(ev.title));
+    L.push('DESCRIPTION:'+escIcs(ev.desc));
+    L.push('BEGIN:VALARM','TRIGGER:-P1D','ACTION:DISPLAY','DESCRIPTION:明天有一次决策复盘','END:VALARM');
+    L.push('END:VEVENT');
+  });
+  L.push('END:VCALENDAR');
+  var blob=new Blob(['\ufeff'+L.join('\r\n')],{type:'text/calendar;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; a.click();
+}
+function icsAll(){
+  var evs=S.decisions.filter(function(d){return d.status==='active' && d.reviewInDays!=null})
+    .map(function(d){
+      return { uid:'dd-review-'+d.id+'@decision-distiller',
+        start:new Date(d.createdAt).getTime()+d.reviewInDays*86400000,
+        title:'⏰ 复盘决策：'+trunc(d.situation,20),
+        desc:'记录于 '+fmtFull(d.createdAt)+' · 领域：'+(d.domain||'—')
+          +(d.falsifier?' · 可证伪承诺：'+trunc(d.falsifier,60):'')
+          +' · 来自「决策蒸馏」App（重复导入日历会产生重复事件，新增决策后请重新导出）' };
+    });
+  if(!evs.length){ toast('没有"进行中且设了复盘日"的决策可导出。'); return; }
+  buildIcs(evs,'决策蒸馏-复盘日历.ics');
+  toast('📅 已导出 '+evs.length+' 条复盘提醒——导入手机/电脑日历后自动提醒');
+}
+function icsOne(id){
+  var d=S.decisions.find(function(x){return x.id===id}); if(!d) return;
+  if(d.reviewInDays==null){ toast('这条记录没有设复盘日。'); return; }
+  buildIcs([{uid:'dd-review-'+d.id+'@decision-distiller',
+    start:new Date(d.createdAt).getTime()+d.reviewInDays*86400000,
+    title:'⏰ 复盘决策：'+trunc(d.situation,20),
+    desc:'记录于 '+fmtFull(d.createdAt)+(d.falsifier?' · 可证伪承诺：'+trunc(d.falsifier,60):'')+' · 来自「决策蒸馏」'}],
+    '复盘-'+fmtFull(d.createdAt)+'.ics');
+  toast('📅 已导出这条复盘的日历事件');
+}
+function importData(inp){
+  var f=inp.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){ try{
+    var d=JSON.parse(r.result);
+    if(!d.decisions||!d.principles) throw new Error('格式不对');
+    confirmBox('导入将覆盖当前全部数据（当前 '+S.decisions.length+' 条决策）。继续？',function(){
+      var localKey=S.settings?S.settings.aiKey:'';   /* 备份文件不含密钥，保留本机已配置的 */
+      S=migrate(d);
+      if(!S.settings.aiKey) S.settings.aiKey=localKey;
+      save(); render(); toast('✅ 导入成功：'+S.decisions.length+' 条决策，'+S.principles.length+' 条原则');
+    });
+  }catch(e){ toast('导入失败：'+e.message); } };
+  r.readAsText(f);
+}
+function resetAll(){
+  confirmBox('⚠️ 将清空全部决策、原则、训练记录，不可恢复。确定？',function(){
+    confirmBox('再次确认：真的要全部清空？建议先导出备份。',function(){
+      localStorage.removeItem(LS_KEY); idbClear(); S=load(); save(); render(); toast('已清空');
+    });
+  });
+}
+function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+
+/* ================= 键盘快捷键 ================= */
+document.addEventListener('keydown',function(e){
+  var ae=document.activeElement, tag=ae?ae.tagName:'';
+  if(e.key==='Escape'){ closeModal(); if(ae&&ae.blur) ae.blur(); return; }
+  if(tag==='TEXTAREA'||tag==='INPUT'||tag==='SELECT') return;
+  if(e.key==='n'||e.key==='N'){ e.preventDefault(); fabQuick(); }
+  if(e.key==='/'){ e.preventDefault(); go('library');
+    setTimeout(function(){ var el=document.getElementById('lib-q'); if(el) el.focus(); },60); }
+});
+
+/* ================= PWA ================= */
+var deferredPrompt=null;
+var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+if(!isStandalone) document.getElementById('install-btn').style.display='';
+function installApp(){
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt=null; }); }
+  else toast('iPhone/iPad：Safari「分享→添加到主屏幕」；安卓 Chrome：菜单「安装应用」；电脑：地址栏右侧安装图标。',4200);
+}
+window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferredPrompt=e; });
+if('serviceWorker' in navigator && /^https?:/.test(location.protocol)){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){ /* file:// 或私网环境下静默失败 */ });
+  });
+}
+
+/* ================= 启动 ================= */
+render();
+/* 请求持久存储（Chrome/Edge：防浏览器压力清理；无害于不支持的浏览器） */
+try{ if(navigator.storage&&navigator.storage.persist){ navigator.storage.persist().then(function(){}); } }catch(e){}
+/* localStorage 被清/损坏时，从 IndexedDB 镜像找回 */
+idbRescue();
+</script>
+</body>
+</html>
